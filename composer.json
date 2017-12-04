@@ -1,7 +1,7 @@
 {
-	"name": "sellastica/scheduler",
+	"name": "sellastica/connector",
 	"type": "project",
-	"homepage": "https://github.com/sellastica/scheduler",
+	"homepage": "https://github.com/sellastica/connector",
 	"license": "proprietary",
 	"authors": [
 		{
@@ -18,7 +18,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"Sellastica\\Scheduler\\": "src/"
+			"Sellastica\\Connector\\": "src/"
 		}
 	}
 }
