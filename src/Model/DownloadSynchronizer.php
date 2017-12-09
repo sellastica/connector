@@ -45,6 +45,8 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	private $offset = 0;
 	/** @var EventDispatcher */
 	private $eventDispatcher;
+	/** @var \Nette\Localization\ITranslator */
+	private $translator;
 
 
 	/**
@@ -57,6 +59,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	 * @param EntityManager $em
 	 * @param \Sellastica\Connector\Logger\LoggerFactory $loggerFactory
 	 * @param EventDispatcher $eventDispatcher
+	 * @param \Nette\Localization\ITranslator $translator
 	 */
 	public function __construct(
 		string $identifier,
@@ -67,7 +70,8 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		IDownloadDataHandler $dataHandler,
 		EntityManager $em,
 		LoggerFactory $loggerFactory,
-		EventDispatcher $eventDispatcher
+		EventDispatcher $eventDispatcher,
+		\Nette\Localization\ITranslator $translator
 	)
 	{
 		\Sellastica\Connector\Model\AbstractSynchronizer::__construct(
@@ -81,6 +85,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		$this->dataHandler = $dataHandler;
 		$this->loggerFactory = $loggerFactory;
 		$this->eventDispatcher = $eventDispatcher;
+		$this->translator = $translator;
 	}
 
 	/**
@@ -112,8 +117,9 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 					break;
 				}
 
-				$logger->notice(sprintf('Trying to download %s items from remote server', $this->itemsPerPage));
-
+				$logger->notice($this->translator->translate(
+					'core.connector.trying_to_download_items', $this->itemsPerPage
+				));
 				//download remote data from ERP
 				//retrive whole response, so we could handle some extra data not present in the data array above
 				set_time_limit(20);
@@ -125,11 +131,12 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 				$this->onResponseReceived($downloadResponse);
 
-				$logger->notice(sprintf(
-					'%s items fetched%s',
-					sizeof($downloadResponse->getData()),
-					sizeof($downloadResponse->getData()) ? '. Processing data' : ''
-				));
+				$dataCount = sizeof($downloadResponse->getData());
+				if ($dataCount) {
+					$logger->notice($this->translator->translate('core.connector.number_of_items_fetched', $dataCount));
+				} else {
+					$logger->notice($this->translator->translate('core.connector.no_items_fetched', $dataCount));
+				}
 
 				//items to create or update
 				foreach ($downloadResponse->getData() as $itemData) {
@@ -145,14 +152,13 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 				}
 
 				if (sizeof($downloadResponse->getData())) {
-					$logger->notice('Processing data finished');
+					$logger->notice($this->translator->translate('core.connector.processing_data_finished'));
 				}
 
 				//items to remove
 				if (sizeof($downloadResponse->getExternalIdsToRemove())) {
-					$logger->notice(sprintf(
-						'Removing %s items',
-						sizeof($downloadResponse->getExternalIdsToRemove())
+					$logger->notice($this->translator->translate(
+						'removing_number_of_items', sizeof($downloadResponse->getExternalIdsToRemove())
 					));
 					foreach ($downloadResponse->getExternalIdsToRemove() as $externalId) {
 						$response = $this->dataHandler->remove($externalId);
@@ -160,7 +166,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 						$logger->fromResponse($response);
 					}
 
-					$logger->notice('Removing finished');
+					$logger->notice($this->translator->translate('core.connector.removing_of_items_finished'));
 					$this->em->flush(); //flush removed items
 				}
 
