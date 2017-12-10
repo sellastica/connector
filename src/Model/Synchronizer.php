@@ -18,14 +18,22 @@ class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 	private $upload = true;
 
 
-	public function synchronize()
+	/**
+	 * @param array $params
+	 * @param bool $manual
+	 * @throws \Exception
+	 * @throws \InvalidArgumentException
+	 * @throws \Throwable
+	 * @throws \UnexpectedValueException
+	 */
+	public function synchronize(array $params = [], bool $manual = false)
 	{
 		if ($this->download && isset($this->downloadSynchronizer)) {
-			$this->downloadSynchronizer->synchronize();
+			$this->downloadSynchronizer->synchronize($params, $manual);
 		}
 
 		if ($this->upload && isset($this->uploadSynchronizer)) {
-			$this->uploadSynchronizer->synchronize();
+			$this->uploadSynchronizer->synchronize($params, $manual);
 		}
 	}
 

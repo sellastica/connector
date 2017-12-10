@@ -90,14 +90,22 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	}
 
 	/**
+	 * @param array $params
+	 * @param bool $manual
 	 * @return void
 	 * @throws \Exception In debug mode
+	 * @throws \InvalidArgumentException
+	 * @throws \Throwable
+	 * @throws \UnexpectedValueException
 	 */
-	public function synchronize(): void
+	public function synchronize(array $params = [], bool $manual = false): void
 	{
 		$synchronization = $this->createSynchronization(SynchronizationType::full(), Direction::up());
+		$synchronization->setParams($params);
+		$synchronization->setManual($manual);
 		$synchronization->start();
 		$this->em->persist($synchronization);
+
 		$this->dataGetter->setProcessId($this->processId);
 		$this->dataHandler->setProcessId($this->processId);
 

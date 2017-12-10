@@ -30,12 +30,16 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	private $type;
 	/** @var \DateTime|null @optional */
 	private $changesSince;
+	/** @var array @optional */
+	private $params = [];
 	/** @var \DateTime|null @optional */
 	private $start;
 	/** @var \DateTime|null @optional */
 	private $end;
 	/** @var bool|null @optional */
 	private $success;
+	/** @var bool @optional */
+	private $manual = false;
 	/** @var bool @optional */
 	private $break = false;
 	/** @var LogSummary */
@@ -147,6 +151,22 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getParams(): array
+	{
+		return $this->params;
+	}
+
+	/**
+	 * @param array $params
+	 */
+	public function setParams(array $params)
+	{
+		$this->params = $params;
+	}
+
+	/**
 	 * @return \DateTime|null
 	 */
 	public function getStart(): ?\DateTime
@@ -203,6 +223,22 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	/**
 	 * @return bool
 	 */
+	public function getManual(): bool
+	{
+		return $this->manual;
+	}
+
+	/**
+	 * @param bool $manual
+	 */
+	public function setManual(bool $manual)
+	{
+		$this->manual = $manual;
+	}
+
+	/**
+	 * @return bool
+	 */
 	public function isBreak(): bool
 	{
 		return $this->relationService->isBreak();
@@ -228,9 +264,11 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 			'direction' => $this->direction->getDirection(),
 			'type' => $this->type->getType(),
 			'changesSince' => $this->changesSince,
+			'params' => $this->params ? serialize($this->params) : null,
 			'start' => $this->start,
 			'end' => $this->end,
 			'success' => $this->success,
+			'manual' => $this->manual,
 		]);
 	}
 }

@@ -23,12 +23,16 @@ class SynchronizationBuilder implements IBuilder
 	private $type;
 	/** @var \DateTime|null */
 	private $changesSince;
+	/** @var array */
+	private $params = [];
 	/** @var \DateTime|null */
 	private $start;
 	/** @var \DateTime|null */
 	private $end;
 	/** @var bool|null */
 	private $success;
+	/** @var bool */
+	private $manual = false;
 	/** @var bool */
 	private $break = false;
 
@@ -113,6 +117,24 @@ class SynchronizationBuilder implements IBuilder
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getParams(): array
+	{
+		return $this->params;
+	}
+
+	/**
+	 * @param array $params
+	 * @return $this
+	 */
+	public function params(array $params)
+	{
+		$this->params = $params;
+		return $this;
+	}
+
+	/**
 	 * @return \DateTime|null
 	 */
 	public function getStart()
@@ -163,6 +185,24 @@ class SynchronizationBuilder implements IBuilder
 	public function success(bool $success = null)
 	{
 		$this->success = $success;
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getManual(): bool
+	{
+		return $this->manual;
+	}
+
+	/**
+	 * @param bool $manual
+	 * @return $this
+	 */
+	public function manual(bool $manual)
+	{
+		$this->manual = $manual;
 		return $this;
 	}
 

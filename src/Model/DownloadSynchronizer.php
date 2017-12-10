@@ -89,10 +89,15 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	}
 
 	/**
+	 * @param array $params
+	 * @param bool $manual
 	 * @return void
 	 * @throws \Exception
+	 * @throws \InvalidArgumentException
+	 * @throws \Throwable
+	 * @throws \UnexpectedValueException
 	 */
-	public function synchronize()
+	public function synchronize(array $params = [], bool $manual = false)
 	{
 		//optimize imports
 		$this->em->optimizeImports(min($this->itemsPerPage, 100));
@@ -103,6 +108,8 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		$this->dataHandler->initialize();
 		//synchronization entity
 		$synchronization = $this->createSynchronization(SynchronizationType::full(), Direction::down());
+		$synchronization->setParams($params);
+		$synchronization->setManual($manual);
 		$synchronization->start();
 		$this->em->persist($synchronization);
 		$this->em->flush();

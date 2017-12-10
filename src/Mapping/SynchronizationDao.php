@@ -69,6 +69,7 @@ class SynchronizationDao extends \Sellastica\Entity\Mapping\Dao
 		$second = null
 	): IBuilder
 	{
+		$data->params = $data->params ? unserialize($data->params) : [];
 		return SynchronizationBuilder::create(
 			$data->processId,
 			$data->application,
