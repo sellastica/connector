@@ -17,8 +17,10 @@ class SynchronizationBuilder implements IBuilder
 	private $application;
 	/** @var \Sellastica\Connector\Model\IIdentifier */
 	private $identifier;
-	/** @var \Sellastica\Connector\Model\Direction */
-	private $direction;
+	/** @var string */
+	private $source;
+	/** @var string */
+	private $target;
 	/** @var \Sellastica\Connector\Model\SynchronizationType */
 	private $type;
 	/** @var \DateTime|null */
@@ -40,21 +42,24 @@ class SynchronizationBuilder implements IBuilder
 	 * @param int $processId
 	 * @param string $application
 	 * @param \Sellastica\Connector\Model\IIdentifier $identifier
-	 * @param \Sellastica\Connector\Model\Direction $direction
+	 * @param string $source
+	 * @param string $target
 	 * @param \Sellastica\Connector\Model\SynchronizationType $type
 	 */
 	public function __construct(
 		int $processId,
 		string $application,
 		\Sellastica\Connector\Model\IIdentifier $identifier,
-		\Sellastica\Connector\Model\Direction $direction,
+		string $source,
+		string $target,
 		\Sellastica\Connector\Model\SynchronizationType $type
 	)
 	{
 		$this->processId = $processId;
 		$this->application = $application;
 		$this->identifier = $identifier;
-		$this->direction = $direction;
+		$this->source = $source;
+		$this->target = $target;
 		$this->type = $type;
 	}
 
@@ -83,11 +88,19 @@ class SynchronizationBuilder implements IBuilder
 	}
 
 	/**
-	 * @return \Sellastica\Connector\Model\Direction
+	 * @return string
 	 */
-	public function getDirection(): \Sellastica\Connector\Model\Direction
+	public function getSource(): string
 	{
-		return $this->direction;
+		return $this->source;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTarget(): string
+	{
+		return $this->target;
 	}
 
 	/**
@@ -244,7 +257,8 @@ class SynchronizationBuilder implements IBuilder
 	 * @param int $processId
 	 * @param string $application
 	 * @param \Sellastica\Connector\Model\IIdentifier $identifier
-	 * @param \Sellastica\Connector\Model\Direction $direction
+	 * @param string $source
+	 * @param string $target
 	 * @param \Sellastica\Connector\Model\SynchronizationType $type
 	 * @return self
 	 */
@@ -252,10 +266,11 @@ class SynchronizationBuilder implements IBuilder
 		int $processId,
 		string $application,
 		\Sellastica\Connector\Model\IIdentifier $identifier,
-		\Sellastica\Connector\Model\Direction $direction,
+		string $source,
+		string $target,
 		\Sellastica\Connector\Model\SynchronizationType $type
 	): self
 	{
-		return new self($processId, $application, $identifier, $direction, $type);
+		return new self($processId, $application, $identifier, $source, $target, $type);
 	}
 }

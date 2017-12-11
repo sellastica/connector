@@ -89,29 +89,37 @@ abstract class AbstractSynchronizer
 
 	/**
 	 * @param \Sellastica\Connector\Model\SynchronizationType|string $type
-	 * @param \Sellastica\Connector\Model\Direction $direction
+	 * @param string $source
+	 * @param string $target
 	 * @return Synchronization
 	 * @throws \UnexpectedValueException
 	 */
-	protected function createSynchronization(SynchronizationType $type, Direction $direction): Synchronization
+	protected function createSynchronization(
+		SynchronizationType $type,
+		string $source,
+		string $target
+	): Synchronization
 	{
 		$identifier = $this->identifierFactory->create($this->identifier);
 		return SynchronizationBuilder::create(
 			$this->processId,
 			$this->app->getSlug(),
 			$identifier,
-			$direction,
+			$source,
+			$target,
 			$type
 		)
-			->changesSince($this->getSinceWhenDate())
+			->changesSince($this->getSinceWhenDate($source, $target))
 			->build();
 	}
 
 	/**
+	 * @param string $source
+	 * @param string $target
 	 * @return \DateTime|null
 	 * @throws \UnexpectedValueException
 	 */
-	protected function getSinceWhenDate(): ?\DateTime
+	protected function getSinceWhenDate(string $source, string $target): ?\DateTime
 	{
 		switch ($this->sinceWhen) {
 			case ISynchronizer::SINCE_EVER:
@@ -120,7 +128,7 @@ abstract class AbstractSynchronizer
 			case ISynchronizer::SINCE_LAST_SYNC:
 				/** @var Synchronization $lastSynchronization */
 				$lastSynchronization = $this->em->getRepository(Synchronization::class)
-					->getLastDownload($this->app->getSlug(), $this->identifier);
+					->getLastDownload($this->app->getSlug(), $this->identifier, $source, $target);
 				return $lastSynchronization ? $lastSynchronization->getStart() : null;
 				break;
 			case ISynchronizer::SINCE_TODAY:

@@ -4,6 +4,12 @@ namespace Sellastica\Connector\Model;
 interface IDownloadCollectionDataGetter
 {
 	/**
+	 * Source indentifier
+	 * @return string
+	 */
+	function getSource(): string;
+
+	/**
 	 * @param int $limit
 	 * @param mixed $offset
 	 * @param array $params

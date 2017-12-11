@@ -4,7 +4,6 @@ namespace Sellastica\Connector\Mapping;
 use Sellastica\Connector\Entity\Synchronization;
 use Sellastica\Connector\Entity\SynchronizationBuilder;
 use Sellastica\Connector\Entity\SynchronizationCollection;
-use Sellastica\Connector\Model\Direction;
 use Sellastica\Connector\Model\SynchronizationType;
 use Sellastica\DataGrid\Mapping\TFilterRulesDao;
 use Sellastica\Entity\Entity\EntityCollection;
@@ -42,22 +41,37 @@ class SynchronizationDao extends \Sellastica\Entity\Mapping\Dao
 	/**
 	 * @param string $application
 	 * @param string $identifier
+	 * @param string $source
+	 * @param string $target
 	 * @return Synchronization|IEntity|null
 	 */
-	public function getLastDownload(string $application, string $identifier): ?Synchronization
+	public function getLastDownload(
+		string $application,
+		string $identifier,
+		string $source,
+		string $target
+	): ?Synchronization
 	{
-		return $this->find($this->mapper->getLastDownload($application, $identifier));
+		return $this->find($this->mapper->getLastDownload($application, $identifier, $source, $target));
 	}
 
 	/**
 	 * @param string $application
 	 * @param string $identifier
+	 * @param string $source
+	 * @param string $target
 	 * @param array|null $types
 	 * @return \Sellastica\Connector\Entity\Synchronization|IEntity|null
 	 */
-	public function getLastUpload(string $application, string $identifier, array $types = null): ?Synchronization
+	public function getLastUpload(
+		string $application,
+		string $identifier,
+		string $source,
+		string $target,
+		array $types = null
+	): ?Synchronization
 	{
-		return $this->find($this->mapper->getLastUpload($application, $identifier, $types));
+		return $this->find($this->mapper->getLastUpload($application, $identifier, $source, $target, $types));
 	}
 
 	/**
@@ -74,7 +88,8 @@ class SynchronizationDao extends \Sellastica\Entity\Mapping\Dao
 			$data->processId,
 			$data->application,
 			$this->identifierFactory->create($data->identifier),
-			Direction::from($data->direction),
+			$data->source,
+			$data->target,
 			SynchronizationType::from($data->type)
 		)->hydrate($data);
 	}

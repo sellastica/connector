@@ -7,6 +7,12 @@ use Sellastica\Entity\Entity\EntityCollection;
 interface IUploadDataHandler
 {
 	/**
+	 * Target indentifier
+	 * @return string
+	 */
+	function getTarget(): string;
+
+	/**
 	 * @param int $processId
 	 */
 	function setProcessId(int $processId);

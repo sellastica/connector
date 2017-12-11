@@ -13,13 +13,24 @@ class SynchronizationRepositoryProxy extends \Sellastica\Entity\Mapping\Reposito
 {
 	use TFilterRulesRepositoryProxy;
 
-	public function getLastDownload(string $application, string $identifier): ?Synchronization
+	public function getLastDownload(
+		string $application,
+		string $identifier,
+		string $source,
+		string $target
+	): ?Synchronization
 	{
-		return $this->getRepository()->getLastDownload($application, $identifier);
+		return $this->getRepository()->getLastDownload($application, $identifier, $source, $target);
 	}
 
-	public function getLastUpload(string $application, string $identifier, array $types = null): ?Synchronization
+	public function getLastUpload(
+		string $application,
+		string $identifier,
+		string $source,
+		string $target,
+		array $types = null
+	): ?Synchronization
 	{
-		return $this->getRepository()->getLastUpload($application, $identifier, $types);
+		return $this->getRepository()->getLastUpload($application, $identifier, $source, $target, $types);
 	}
 }

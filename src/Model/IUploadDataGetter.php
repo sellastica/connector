@@ -6,6 +6,12 @@ use Sellastica\Entity\Entity\EntityCollection;
 interface IUploadDataGetter
 {
 	/**
+	 * Source indentifier
+	 * @return string
+	 */
+	function getSource(): string;
+
+	/**
 	 * @param int $synchronizationId
 	 */
 	function setProcessId(int $synchronizationId);

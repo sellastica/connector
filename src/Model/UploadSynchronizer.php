@@ -100,7 +100,12 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	 */
 	public function synchronize(array $params = [], bool $manual = false): void
 	{
-		$synchronization = $this->createSynchronization(SynchronizationType::full(), Direction::up());
+		$synchronization = $this->createSynchronization(
+			SynchronizationType::full(), $this->dataGetter->getSource(), $this->dataHandler->getTarget()
+		);
+		$synchronization->setChangesSince(
+			$this->getSinceWhenDate($this->dataGetter->getSource(), $this->dataHandler->getTarget())
+		);
 		$synchronization->setParams($params);
 		$synchronization->setManual($manual);
 		$synchronization->start();
@@ -200,7 +205,9 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	 */
 	public function upload($data): ConnectorResponse
 	{
-		$synchronization = $this->createSynchronization(SynchronizationType::single(), Direction::up());
+		$synchronization = $this->createSynchronization(
+			SynchronizationType::single(), $this->dataGetter->getSource(), $this->dataHandler->getTarget()
+		);
 		$synchronization->start();
 		$this->em->persist($synchronization);
 
@@ -256,7 +263,9 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 
 	public function batch(): void
 	{
-		$synchronization = $this->createSynchronization(SynchronizationType::batch(), Direction::up());
+		$synchronization = $this->createSynchronization(
+			SynchronizationType::batch(), $this->dataGetter->getSource(), $this->dataHandler->getTarget()
+		);
 		$synchronization->start();
 		$this->em->persist($synchronization);
 		$this->dataGetter->setProcessId($this->processId);

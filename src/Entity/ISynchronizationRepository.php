@@ -21,15 +21,30 @@ interface ISynchronizationRepository extends IRepository
 	/**
 	 * @param string $application
 	 * @param string $identifier
+	 * @param string $source
+	 * @param string $target
 	 * @return Synchronization|null
 	 */
-	function getLastDownload(string $application, string $identifier): ?Synchronization;
+	function getLastDownload(
+		string $application,
+		string $identifier,
+		string $source,
+		string $target
+	): ?Synchronization;
 
 	/**
 	 * @param string $application
 	 * @param string $identifier
+	 * @param string $source
+	 * @param string $target
 	 * @param array|null $types
 	 * @return Synchronization|null
 	 */
-	function getLastUpload(string $application, string $identifier, array $types = null): ?Synchronization;
+	function getLastUpload(
+		string $application,
+		string $identifier,
+		string $source,
+		string $target,
+		array $types = null
+	): ?Synchronization;
 }

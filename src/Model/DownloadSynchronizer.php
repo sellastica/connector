@@ -107,9 +107,16 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		$this->dataHandler->setProcessId($this->processId);
 		$this->dataHandler->initialize();
 		//synchronization entity
-		$synchronization = $this->createSynchronization(SynchronizationType::full(), Direction::down());
+		$synchronization = $this->createSynchronization(
+			SynchronizationType::full(),
+			$this->dataGetter->getSource(),
+			$this->dataHandler->getTarget()
+		);
 		$synchronization->setParams($params);
 		$synchronization->setManual($manual);
+		$synchronization->setChangesSince(
+			$this->getSinceWhenDate($this->dataGetter->getSource(), $this->dataHandler->getTarget())
+		);
 		$synchronization->start();
 		$this->em->persist($synchronization);
 		$this->em->flush();

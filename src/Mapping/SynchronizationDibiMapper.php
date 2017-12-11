@@ -2,7 +2,6 @@
 namespace Sellastica\Connector\Mapping;
 
 use Sellastica\Connector\Entity\Synchronization;
-use Sellastica\Connector\Model\Direction;
 use Sellastica\DataGrid\Mapping\TFilterRulesDibiMapper;
 use Sellastica\DataGrid\Model\FilterRuleCollection;
 use Sellastica\Entity\Configuration;
@@ -18,13 +17,21 @@ class SynchronizationDibiMapper extends DibiMapper
 	/**
 	 * @param string $application
 	 * @param string $identifier
+	 * @param string $source
+	 * @param string $target
 	 * @return int|null
 	 */
-	public function getLastDownload(string $application, string $identifier): ?int
+	public function getLastDownload(
+		string $application,
+		string $identifier,
+		string $source,
+		string $target
+	): ?int
 	{
 		return $this->getResourceWithIds()
 			->where('application = %s', $application)
-			->where('direction = %s', Direction::DOWN)
+			->where('source = %s', $source)
+			->where('target = %s', $target)
 			->where('identifier = %s', $identifier)
 			->orderBy('id', \dibi::DESC)
 			->fetchSingle();
@@ -33,14 +40,23 @@ class SynchronizationDibiMapper extends DibiMapper
 	/**
 	 * @param string $application
 	 * @param string $identifier
+	 * @param string $source
+	 * @param string $target
 	 * @param array|null $types
 	 * @return int|null
 	 */
-	public function getLastUpload(string $application, string $identifier, array $types = null): ?int
+	public function getLastUpload(
+		string $application,
+		string $identifier,
+		string $source,
+		string $target,
+		array $types = null
+	): ?int
 	{
 		$resource = $this->getResourceWithIds()
 			->where('application = %s', $application)
-			->where('direction = %s', Direction::UP)
+			->where('source = %s', $source)
+			->where('target = %s', $target)
 			->where('identifier = %s', $identifier)
 			->orderBy('id', \dibi::DESC);
 

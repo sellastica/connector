@@ -8,6 +8,12 @@ interface IDownloadDataHandler
 	function initialize(): void;
 
 	/**
+	 * Target indentifier
+	 * @return string
+	 */
+	function getTarget(): string;
+
+	/**
 	 * @param int $synchronizationId
 	 */
 	function setProcessId(int $synchronizationId);

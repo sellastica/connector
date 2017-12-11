@@ -1,7 +1,6 @@
 <?php
 namespace Sellastica\Connector\Entity;
 
-use Sellastica\Connector\Model\Direction;
 use Sellastica\Connector\Model\LogSummary;
 use Sellastica\Connector\Model\SynchronizationType;
 use Sellastica\Entity\Entity\AbstractEntity;
@@ -24,8 +23,10 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	private $application;
 	/** @var \Sellastica\Connector\Model\IIdentifier @required */
 	private $identifier;
-	/** @var \Sellastica\Connector\Model\Direction @required */
-	private $direction;
+	/** @var string @required */
+	private $source;
+	/** @var string @required */
+	private $target;
 	/** @var \Sellastica\Connector\Model\SynchronizationType @required */
 	private $type;
 	/** @var \DateTime|null @optional */
@@ -103,19 +104,35 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	}
 
 	/**
-	 * @return \Sellastica\Connector\Model\Direction
+	 * @return string
 	 */
-	public function getDirection(): Direction
+	public function getSource(): string
 	{
-		return $this->direction;
+		return $this->source;
 	}
 
 	/**
-	 * @param \Sellastica\Connector\Model\Direction $direction
+	 * @param string $source
 	 */
-	public function setDirection(Direction $direction)
+	public function setSource(string $source)
 	{
-		$this->direction = $direction;
+		$this->source = $source;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTarget(): string
+	{
+		return $this->target;
+	}
+
+	/**
+	 * @param string $target
+	 */
+	public function setTarget(string $target)
+	{
+		$this->target = $target;
 	}
 
 	/**
@@ -261,7 +278,8 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 			'application' => $this->application,
 			'identifier' => $this->identifier->getCode(),
 			'processId' => $this->processId,
-			'direction' => $this->direction->getDirection(),
+			'source' => $this->source,
+			'target' => $this->target,
 			'type' => $this->type->getType(),
 			'changesSince' => $this->changesSince,
 			'params' => $this->params ? serialize($this->params) : null,

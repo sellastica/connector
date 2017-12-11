@@ -15,21 +15,38 @@ class SynchronizationRepository extends Repository implements ISynchronizationRe
 	use TFilterRulesRepository;
 
 	/**
+	 * @param string $application
 	 * @param string $identifier
+	 * @param string $source
+	 * @param string $target
 	 * @return \Sellastica\Connector\Entity\Synchronization|null
 	 */
-	public function getLastDownload(string $application, string $identifier): ?Synchronization
+	public function getLastDownload(
+		string $application,
+		string $identifier,
+		string $source,
+		string $target
+	): ?Synchronization
 	{
-		return $this->initialize($this->dao->getLastDownload($application, $identifier));
+		return $this->initialize($this->dao->getLastDownload($application, $identifier, $source, $target));
 	}
 
 	/**
+	 * @param string $application
 	 * @param string $identifier
+	 * @param string $source
+	 * @param string $target
 	 * @param array|null $types
 	 * @return \Sellastica\Connector\Entity\Synchronization|null
 	 */
-	public function getLastUpload(string $application, string $identifier, array $types = null): ?Synchronization
+	public function getLastUpload(
+		string $application,
+		string $identifier,
+		string $source,
+		string $target,
+		array $types = null
+	): ?Synchronization
 	{
-		return $this->initialize($this->dao->getLastUpload($application, $identifier, $types));
+		return $this->initialize($this->dao->getLastUpload($application, $identifier, $source, $target, $types));
 	}
 }
