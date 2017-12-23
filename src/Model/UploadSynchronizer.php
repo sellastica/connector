@@ -174,6 +174,9 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 						$this->monolog->exception(
 							$e, sprintf('%s [%s]', $e->getMessage(), $entity->getId())
 						);
+						if ($e instanceof \Sellastica\Connector\Exception\AbortException) {
+							break(2); //foreach and while
+						}
 					} else {
 						throw $e;
 					}
