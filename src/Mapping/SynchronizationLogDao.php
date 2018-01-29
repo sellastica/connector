@@ -36,6 +36,25 @@ class SynchronizationLogDao extends Dao
 	}
 
 	/**
+	 * @param string $application
+	 * @param string $identifier
+	 * @param int $internalId
+	 * @param \Sellastica\Entity\Configuration|null $configuration
+	 * @return SynchronizationLogCollection|EntityCollection
+	 */
+	public function findByInternalId(
+		string $application,
+		string $identifier,
+		int $internalId,
+		\Sellastica\Entity\Configuration $configuration = null
+	): SynchronizationLogCollection
+	{
+		return $this->getEntitiesFromCacheOrStorage(
+			$this->mapper->findByInternalId($application, $identifier, $internalId, $configuration)
+		);
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	protected function getBuilder(

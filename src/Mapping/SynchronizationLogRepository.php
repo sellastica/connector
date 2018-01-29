@@ -30,4 +30,23 @@ class SynchronizationLogRepository extends \Sellastica\Entity\Mapping\Repository
 	{
 		$this->dao->clearOldLogEntries($dateTime);
 	}
+
+	/**
+	 * @param string $application
+	 * @param string $identifier
+	 * @param int $internalId
+	 * @param \Sellastica\Entity\Configuration|null $configuration
+	 * @return \Sellastica\Connector\Entity\SynchronizationLogCollection
+	 */
+	public function findByInternalId(
+		string $application,
+		string $identifier,
+		int $internalId,
+		\Sellastica\Entity\Configuration $configuration = null
+	): \Sellastica\Connector\Entity\SynchronizationLogCollection
+	{
+		return $this->initialize(
+			$this->dao->findByInternalId($application, $identifier, $internalId, $configuration)
+		);
+	}
 }

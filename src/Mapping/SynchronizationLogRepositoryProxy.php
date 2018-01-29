@@ -23,4 +23,14 @@ class SynchronizationLogRepositoryProxy extends RepositoryProxy implements ISync
 	{
 		$this->getRepository()->clearOldLogEntries($dateTime);
 	}
+
+	public function findByInternalId(
+		string $application,
+		string $identifier,
+		int $internalId,
+		\Sellastica\Entity\Configuration $configuration = null
+	): \Sellastica\Connector\Entity\SynchronizationLogCollection
+	{
+		return $this->getRepository()->findByInternalId($application, $identifier, $internalId, $configuration);
+	}
 }

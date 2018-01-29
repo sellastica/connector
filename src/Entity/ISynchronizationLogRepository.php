@@ -29,4 +29,18 @@ interface ISynchronizationLogRepository extends IRepository
 	 * @return void
 	 */
 	function clearOldLogEntries(\DateTime $dateTime);
+
+	/**
+	 * @param string $application
+	 * @param string $identifier
+	 * @param int $internalId
+	 * @param \Sellastica\Entity\Configuration|null $configuration
+	 * @return SynchronizationLogCollection
+	 */
+	function findByInternalId(
+		string $application,
+		string $identifier,
+		int $internalId,
+		\Sellastica\Entity\Configuration $configuration = null
+	): SynchronizationLogCollection;
 }

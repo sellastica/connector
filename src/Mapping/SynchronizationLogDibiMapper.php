@@ -78,6 +78,34 @@ class SynchronizationLogDibiMapper extends \Sellastica\Entity\Mapping\DibiMapper
 	}
 
 	/**
+	 * @param string $application
+	 * @param string $identifier
+	 * @param int $internalId
+	 * @param \Sellastica\Entity\Configuration|null $configuration
+	 * @return array
+	 */
+	public function findByInternalId(
+		string $application,
+		string $identifier,
+		int $internalId,
+		Configuration $configuration = null
+	): array
+	{
+		$resource = $this->getResourceWithIds()
+			->innerJoin('synchronization')->as('s')
+			->on('s.id = %n.synchronizationId', $this->getTableName())
+			->where('application = %s', $application)
+			->where('identifier = %s', $identifier)
+			->where('internalId = %i', $internalId);
+
+		if ($configuration) {
+			$this->applyConfiguration($resource);
+		}
+
+		return $resource->fetchPairs();
+	}
+
+	/**
 	 * @param \Sellastica\Entity\Configuration $configuration
 	 * @param FilterRuleCollection $rules
 	 * @return \Dibi\Fluent
