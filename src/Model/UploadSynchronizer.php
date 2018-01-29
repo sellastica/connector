@@ -28,6 +28,8 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	/** @var array */
 	public $onItemModified = [];
 	/** @var array */
+	public $onOffsetSynchronized = [];
+	/** @var array */
 	public $onSynchronizationFinished = [];
 
 	/** @var IUploadDataGetter */
@@ -126,7 +128,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			//get local data for upload
 			set_time_limit(20);
 			$entities = $this->changesOnly()
-				? $this->dataGetter->getChanges($this->itemsPerPage, $this->offset, $this->params)
+				? $this->dataGetter->getChanges($this->itemsPerPage, $this->offset, $this->params, $synchronization->getChangesSince())
 				: $this->dataGetter->getAll($this->itemsPerPage, $this->offset, $this->params);
 
 			//change offset
@@ -184,6 +186,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			}
 
 			$logger->save(); //save after each iteration
+			$this->onOffsetSynchronized();
 		} while (
 			$entities->count()
 			&& $this->finishSynchronizing !== true
