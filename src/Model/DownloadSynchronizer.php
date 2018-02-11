@@ -1,7 +1,6 @@
 <?php
 namespace Sellastica\Connector\Model;
 
-use Bazo\Events\EventDispatcher;
 use Nette\SmartObject;
 use Sellastica\App\Entity\App;
 use Sellastica\Connector\Exception\IErpConnectorException;
@@ -43,7 +42,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	 * Offset in first iteration = 0, offset in the next iteration must be returned from the DownloadResponse
 	 */
 	private $offset = 0;
-	/** @var EventDispatcher */
+	/** @var \Sellastica\Events\EventDispatcher */
 	private $eventDispatcher;
 	/** @var \Nette\Localization\ITranslator */
 	private $translator;
@@ -58,7 +57,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	 * @param IDownloadDataHandler $dataHandler
 	 * @param EntityManager $em
 	 * @param \Sellastica\Connector\Logger\LoggerFactory $loggerFactory
-	 * @param EventDispatcher $eventDispatcher
+	 * @param \Sellastica\Events\EventDispatcher $eventDispatcher
 	 * @param \Nette\Localization\ITranslator $translator
 	 */
 	public function __construct(
@@ -70,7 +69,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		IDownloadDataHandler $dataHandler,
 		EntityManager $em,
 		LoggerFactory $loggerFactory,
-		EventDispatcher $eventDispatcher,
+		\Sellastica\Events\EventDispatcher $eventDispatcher,
 		\Nette\Localization\ITranslator $translator
 	)
 	{
