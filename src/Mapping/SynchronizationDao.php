@@ -97,7 +97,7 @@ class SynchronizationDao extends \Sellastica\Entity\Mapping\Dao
 	/**
 	 * @return \Sellastica\Entity\Entity\EntityCollection|\Sellastica\Connector\Entity\SynchronizationCollection
 	 */
-	protected function getEmptyCollection(): EntityCollection
+	public function getEmptyCollection(): EntityCollection
 	{
 		return new SynchronizationCollection;
 	}

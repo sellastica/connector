@@ -70,7 +70,7 @@ class SynchronizationLogDao extends Dao
 	/**
 	 * @return \Sellastica\Entity\Entity\EntityCollection|\Sellastica\Connector\Entity\SynchronizationLogCollection
 	 */
-	protected function getEmptyCollection(): EntityCollection
+	public function getEmptyCollection(): EntityCollection
 	{
 		return new SynchronizationLogCollection;
 	}
