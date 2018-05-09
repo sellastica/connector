@@ -73,7 +73,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		\Nette\Localization\ITranslator $translator
 	)
 	{
-		\Sellastica\Connector\Model\AbstractSynchronizer::__construct(
+		parent::__construct(
 			$identifier,
 			$processId,
 			$app,

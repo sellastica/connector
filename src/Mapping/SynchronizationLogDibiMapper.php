@@ -137,6 +137,10 @@ class SynchronizationLogDibiMapper extends \Sellastica\Entity\Mapping\DibiMapper
 					$resource->where('%n.statusCode >= 400', $this->getTableName());
 				}
 			}
+
+			if ($rules['status_code']) {
+				$resource->where('%n.statusCode = %i', $this->getTableName(), $rules['status_code']->getValue());
+			}
 		}
 
 		return $resource;

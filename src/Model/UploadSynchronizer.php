@@ -75,7 +75,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		Environment $environment
 	)
 	{
-		\Sellastica\Connector\Model\AbstractSynchronizer::__construct(
+		parent::__construct(
 			$identifier,
 			$processId,
 			$app,
