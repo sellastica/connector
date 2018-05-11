@@ -21,15 +21,15 @@ abstract class AbstractDownloadDataGetter implements IDownloadCollectionDataGett
 
 	/**
 	 * @param $response
-	 * @param array $params
+	 * @param OptionsRequest $params
 	 * @return mixed
 	 * @throws AbortException
 	 */
-	protected function handleResponse($response, array $params)
+	protected function handleResponse($response, OptionsRequest $params)
 	{
 		if (isset($this->lastResponse) && $this->lastResponse == $response) {
 			throw new AbortException('Cyclic data fetching');
-		} elseif (!empty($params['dump_response'])) {
+		} elseif ($params->isDump()) {
 			\Sellastica\Dumper\Dumper::dump($response);
 			exit;
 		}

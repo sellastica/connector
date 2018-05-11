@@ -20,7 +20,7 @@ interface ISynchronizer
 	 * @param bool $manual
 	 * @return void
 	 */
-	function synchronize(array $params = [], bool $manual = false);
+	function synchronize($params = null, bool $manual = false);
 
 	/**
 	 * @return \Sellastica\Connector\Logger\Logger

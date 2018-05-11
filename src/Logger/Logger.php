@@ -38,6 +38,7 @@ class Logger
 	 * @param array|string|null $description
 	 * @param string|null $sourceData
 	 * @param string|null $resultData
+	 * @return SynchronizationLog
 	 */
 	public function add(
 		int $statusCode = null,
@@ -48,13 +49,13 @@ class Logger
 		$description = null,
 		$sourceData = null,
 		$resultData = null
-	): void
+	): SynchronizationLog
 	{
 		if (is_array($description)) {
 			$description = implode(PHP_EOL, array_filter($description));
 		}
 
-		$this->items[] = SynchronizationLogBuilder::create($this->synchronizationId, new \DateTime())
+		$this->items[] = $item = SynchronizationLogBuilder::create($this->synchronizationId, new \DateTime())
 			->statusCode($statusCode)
 			->internalId($internalId)
 			->remoteId($remoteId)
@@ -64,6 +65,8 @@ class Logger
 			->sourceData(isset($sourceData) ? serialize($sourceData) : null)
 			->resultData(isset($resultData) ? serialize($resultData) : null)
 			->build();
+
+		return $item;
 	}
 
 	/**
@@ -102,10 +105,11 @@ class Logger
 
 	/**
 	 * @param string|array $notice
+	 * @return SynchronizationLog
 	 */
-	public function notice($notice): void
+	public function notice($notice): SynchronizationLog
 	{
-		$this->add(null, null, null, null, null, $notice);
+		return $this->add(null, null, null, null, null, $notice);
 	}
 
 	public function clearOldLogEntries(): void

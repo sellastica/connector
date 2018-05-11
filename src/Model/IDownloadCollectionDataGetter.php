@@ -15,7 +15,7 @@ interface IDownloadCollectionDataGetter
 	 * @param array $params
 	 * @return \Sellastica\Connector\Model\DownloadResponse
 	 */
-	function getAll(int $limit, $offset, array $params = []): \Sellastica\Connector\Model\DownloadResponse;
+	function getAll(int $limit, $offset, $params = null): \Sellastica\Connector\Model\DownloadResponse;
 
 	/**
 	 * @param int $limit
@@ -24,7 +24,7 @@ interface IDownloadCollectionDataGetter
 	 * @param array $params
 	 * @return \Sellastica\Connector\Model\DownloadResponse
 	 */
-	function getModified(int $limit, $offset, ?\DateTime $sinceWhen, array $params = []): \Sellastica\Connector\Model\DownloadResponse;
+	function getModified(int $limit, $offset, ?\DateTime $sinceWhen, $params = null): \Sellastica\Connector\Model\DownloadResponse;
 
 	/**
 	 * @param int $synchronizationId

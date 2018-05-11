@@ -29,7 +29,7 @@ interface IDownloadDataHandler
 	 * @param array $params
 	 * @return \Sellastica\Connector\Model\ConnectorResponse
 	 */
-	function modify($data, ?\DateTime $sinceWhen, array $params = []): \Sellastica\Connector\Model\ConnectorResponse;
+	function modify($data, ?\DateTime $sinceWhen, $params = null): \Sellastica\Connector\Model\ConnectorResponse;
 
 	/**
 	 * @param string $externalId

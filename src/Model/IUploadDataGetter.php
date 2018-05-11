@@ -22,7 +22,7 @@ interface IUploadDataGetter
 	 * @param array $params
 	 * @return EntityCollection
 	 */
-	function getAll(int $limit, int $offset, array $params = []): EntityCollection;
+	function getAll(int $limit, int $offset, $params = null): EntityCollection;
 
 	/**
 	 * @param int $limit
@@ -30,5 +30,5 @@ interface IUploadDataGetter
 	 * @param array $params
 	 * @return EntityCollection
 	 */
-	function getChanges(int $limit, int $offset, array $params = []): EntityCollection;
+	function getChanges(int $limit, int $offset, $params = null): EntityCollection;
 }

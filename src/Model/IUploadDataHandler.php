@@ -23,7 +23,7 @@ interface IUploadDataHandler
 	 * @param array $params
 	 * @return \Sellastica\Connector\Model\ConnectorResponse
 	 */
-	function modify($data, ?\DateTime $sinceWhen, array $params = []): \Sellastica\Connector\Model\ConnectorResponse;
+	function modify($data, ?\DateTime $sinceWhen, $params = null): \Sellastica\Connector\Model\ConnectorResponse;
 
 	/**
 	 * @param \Sellastica\Entity\Entity\EntityCollection $contacts

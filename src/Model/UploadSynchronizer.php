@@ -100,7 +100,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	 * @throws \Throwable
 	 * @throws \UnexpectedValueException
 	 */
-	public function synchronize(array $params = [], bool $manual = false): void
+	public function synchronize($params = null, bool $manual = false): void
 	{
 		$synchronization = $this->createSynchronization(
 			SynchronizationType::full(), $this->dataGetter->getSource(), $this->dataHandler->getTarget()

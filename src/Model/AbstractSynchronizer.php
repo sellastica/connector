@@ -21,8 +21,8 @@ abstract class AbstractSynchronizer
 	protected $identifier;
 	/** @var int */
 	protected $processId;
-	/** @var array */
-	protected $params = [];
+	/** @var mixed */
+	protected $params;
 	/** @var \Sellastica\Entity\EntityManager */
 	protected $em;
 	/** @var IIdentifierFactory */
@@ -79,10 +79,11 @@ abstract class AbstractSynchronizer
 	{
 		return $this->sinceWhen !== ISynchronizer::SINCE_EVER;
 	}
+
 	/**
-	 * @param array $params
+	 * @param $params
 	 */
-	public function setParams(array $params)
+	public function setParams($params)
 	{
 		$this->params = $params;
 	}

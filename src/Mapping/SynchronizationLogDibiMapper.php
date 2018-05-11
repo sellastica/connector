@@ -126,10 +126,12 @@ class SynchronizationLogDibiMapper extends \Sellastica\Entity\Mapping\DibiMapper
 		}
 
 		if (isset($rules)) {
+			//application
 			if ($rules['application']) {
 				$resource->where('s.application = %s', $rules['application']->getValue());
 			}
 
+			//success
 			if ($rules['success']) {
 				if ($rules['success']->getValue()) {
 					$resource->where('%n.statusCode < 400', $this->getTableName());
@@ -138,8 +140,18 @@ class SynchronizationLogDibiMapper extends \Sellastica\Entity\Mapping\DibiMapper
 				}
 			}
 
+			//status code
 			if ($rules['status_code']) {
 				$resource->where('%n.statusCode = %i', $this->getTableName(), $rules['status_code']->getValue());
+			}
+
+			//record type
+			if ($rules['record_type']) {
+				if ($rules['record_type']->getValue() === 'notice') {
+					$resource->where('%n.internalId IS NULL', $this->getTableName());
+				} else {
+					$resource->where('%n.internalId IS NOT NULL', $this->getTableName());
+				}
 			}
 		}
 

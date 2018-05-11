@@ -31,8 +31,8 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	private $type;
 	/** @var \DateTime|null @optional */
 	private $changesSince;
-	/** @var array @optional */
-	private $params = [];
+	/** @var mixed @optional */
+	private $params;
 	/** @var \DateTime|null @optional */
 	private $start;
 	/** @var \DateTime|null @optional */
@@ -168,17 +168,17 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	}
 
 	/**
-	 * @return array
+	 * @return mixed
 	 */
-	public function getParams(): array
+	public function getParams()
 	{
 		return $this->params;
 	}
 
 	/**
-	 * @param array $params
+	 * @param $params
 	 */
-	public function setParams(array $params)
+	public function setParams($params)
 	{
 		$this->params = $params;
 	}
@@ -282,7 +282,7 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 			'target' => $this->target,
 			'type' => $this->type->getType(),
 			'changesSince' => $this->changesSince,
-			'params' => $this->params ? serialize($this->params) : null,
+			'params' => isset($this->params) ? serialize($this->params) : null,
 			'start' => $this->start,
 			'end' => $this->end,
 			'success' => $this->success,

@@ -25,8 +25,8 @@ class SynchronizationBuilder implements IBuilder
 	private $type;
 	/** @var \DateTime|null */
 	private $changesSince;
-	/** @var array */
-	private $params = [];
+	/** @var mixed */
+	private $params;
 	/** @var \DateTime|null */
 	private $start;
 	/** @var \DateTime|null */
@@ -130,18 +130,18 @@ class SynchronizationBuilder implements IBuilder
 	}
 
 	/**
-	 * @return array
+	 * @return mixed
 	 */
-	public function getParams(): array
+	public function getParams()
 	{
 		return $this->params;
 	}
 
 	/**
-	 * @param array $params
+	 * @param mixed $params
 	 * @return $this
 	 */
-	public function params(array $params)
+	public function params($params)
 	{
 		$this->params = $params;
 		return $this;

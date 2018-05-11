@@ -225,11 +225,12 @@ class SynchronizationLog extends AbstractEntity
 	}
 
 	/**
-	 * @return null|string
+	 * @param bool $unserialize
+	 * @return mixed
 	 */
-	public function getSourceData(): ?string
+	public function getSourceData(bool $unserialize = true)
 	{
-		return $this->sourceData;
+		return $unserialize ? unserialize($this->sourceData) : $this->sourceData;
 	}
 
 	/**

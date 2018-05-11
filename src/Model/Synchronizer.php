@@ -26,7 +26,7 @@ class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 	 * @throws \Throwable
 	 * @throws \UnexpectedValueException
 	 */
-	public function synchronize(array $params = [], bool $manual = false)
+	public function synchronize($params = null, bool $manual = false)
 	{
 		if ($this->download && isset($this->downloadSynchronizer)) {
 			$this->downloadSynchronizer->synchronize($params, $manual);
@@ -55,15 +55,14 @@ class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 
 	/**
 	 * @param int $batch
-	 * @param string|null $logType
-	 * @throws IErpConnectorException
-	 * @throws \Exception
+	 * @param array $params
+	 * @param bool $manual
 	 */
-	public function batch(int $batch, string $logType = null)
+	public function batch(int $batch, $params = null, bool $manual = false)
 	{
 		//download does not have batch
 		if ($this->download && isset($this->downloadSynchronizer)) {
-			$this->downloadSynchronizer->synchronize();
+			$this->downloadSynchronizer->synchronize($params, $manual);
 		}
 
 		//upload does...

@@ -88,7 +88,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	}
 
 	/**
-	 * @param array $params
+	 * @param OptionsRequest $params
 	 * @param bool $manual
 	 * @return void
 	 * @throws \Exception
@@ -96,7 +96,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	 * @throws \Throwable
 	 * @throws \UnexpectedValueException
 	 */
-	public function synchronize(array $params = [], bool $manual = false)
+	public function synchronize(OptionsRequest $params = null, bool $manual = false)
 	{
 		//optimize imports
 		$this->em->optimizeImports(min($this->itemsPerPage, 100));
@@ -105,6 +105,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		$this->dataGetter->setProcessId($this->processId);
 		$this->dataHandler->setProcessId($this->processId);
 		$this->dataHandler->initialize();
+
 		//synchronization entity
 		$synchronization = $this->createSynchronization(
 			SynchronizationType::full(),
@@ -133,6 +134,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 				$logger->notice($this->translator->translate(
 					'core.connector.trying_to_download_items', $this->itemsPerPage
 				));
+
 				//download remote data from ERP
 				//retrive whole response, so we could handle some extra data not present in the data array above
 				set_time_limit(20);
@@ -145,10 +147,12 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 				$this->onResponseReceived($downloadResponse);
 
 				$dataCount = sizeof($downloadResponse->getData());
-				if ($dataCount) {
-					$logger->notice($this->translator->translate('core.connector.number_of_items_fetched', $dataCount));
-				} else {
-					$logger->notice($this->translator->translate('core.connector.no_items_fetched', $dataCount));
+				$item = $logger->notice($this->translator->translate(
+					$dataCount ? 'core.connector.number_of_items_fetched' : 'core.connector.no_items_fetched',
+					$dataCount
+				));
+				if ($downloadResponse->getData() !== null) {
+					$item->setSourceData(serialize($downloadResponse->getData()));
 				}
 
 				//items to create or update
@@ -158,6 +162,10 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 					$response = $this->dataHandler->modify(
 						$itemData, $synchronization->getChangesSince(), $this->params
 					);
+					if (!$response->getSourceData()) {
+						$response->setSourceData($itemData);
+					}
+
 					$this->onItemModified($response, $itemData);
 					if ($response->getStatusCode() !== ConnectorResponse::IGNORED) {
 						$logger->fromResponse($response);
