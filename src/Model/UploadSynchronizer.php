@@ -92,7 +92,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	}
 
 	/**
-	 * @param array $params
+	 * @param OptionsRequest|null $params
 	 * @param bool $manual
 	 * @return void
 	 * @throws \Exception In debug mode
@@ -100,7 +100,10 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	 * @throws \Throwable
 	 * @throws \UnexpectedValueException
 	 */
-	public function synchronize($params = null, bool $manual = false): void
+	public function synchronize(
+		OptionsRequest $params = null, 
+		bool $manual = false
+	): void
 	{
 		$synchronization = $this->createSynchronization(
 			SynchronizationType::full(), $this->dataGetter->getSource(), $this->dataHandler->getTarget()

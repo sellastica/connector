@@ -20,15 +20,15 @@ interface IUploadDataHandler
 	/**
 	 * @param $data
 	 * @param \DateTime|null $sinceWhen
-	 * @param array $params
-	 * @return \Sellastica\Connector\Model\ConnectorResponse
+	 * @param OptionsRequest|null $params
+	 * @return ConnectorResponse
 	 */
-	function modify($data, ?\DateTime $sinceWhen, $params = null): \Sellastica\Connector\Model\ConnectorResponse;
+	function modify($data, ?\DateTime $sinceWhen, OptionsRequest $params = null): ConnectorResponse;
 
 	/**
 	 * @param \Sellastica\Entity\Entity\EntityCollection $contacts
-	 * @return \Sellastica\Connector\Model\ConnectorResponse
+	 * @return ConnectorResponse
 	 * @throws NotImplementedException If batch upload is not implemented
 	 */
-	function batch(EntityCollection $contacts): \Sellastica\Connector\Model\ConnectorResponse;
+	function batch(EntityCollection $contacts): ConnectorResponse;
 }

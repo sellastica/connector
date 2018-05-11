@@ -19,16 +19,16 @@ interface IUploadDataGetter
 	/**
 	 * @param int $limit
 	 * @param int $offset
-	 * @param array $params
+	 * @param OptionsRequest|null $params
 	 * @return EntityCollection
 	 */
-	function getAll(int $limit, int $offset, $params = null): EntityCollection;
+	function getAll(int $limit, int $offset, OptionsRequest $params = null): EntityCollection;
 
 	/**
 	 * @param int $limit
 	 * @param int $offset
-	 * @param array $params
+	 * @param OptionsRequest|null $params
 	 * @return EntityCollection
 	 */
-	function getChanges(int $limit, int $offset, $params = null): EntityCollection;
+	function getChanges(int $limit, int $offset, OptionsRequest $params = null): EntityCollection;
 }

@@ -16,11 +16,14 @@ interface ISynchronizer
 
 
 	/**
-	 * @param array $params
+	 * @param OptionsRequest|null $params
 	 * @param bool $manual
 	 * @return void
 	 */
-	function synchronize($params = null, bool $manual = false);
+	function synchronize(
+		OptionsRequest $params = null,
+		bool $manual = false
+	);
 
 	/**
 	 * @return \Sellastica\Connector\Logger\Logger

@@ -96,7 +96,10 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	 * @throws \Throwable
 	 * @throws \UnexpectedValueException
 	 */
-	public function synchronize(OptionsRequest $params = null, bool $manual = false)
+	public function synchronize(
+		OptionsRequest $params = null, 
+		bool $manual = false
+	)
 	{
 		//optimize imports
 		$this->em->optimizeImports(min($this->itemsPerPage, 100));

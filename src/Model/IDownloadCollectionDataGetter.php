@@ -12,19 +12,19 @@ interface IDownloadCollectionDataGetter
 	/**
 	 * @param int $limit
 	 * @param mixed $offset
-	 * @param array $params
-	 * @return \Sellastica\Connector\Model\DownloadResponse
+	 * @param OptionsRequest|null $params
+	 * @return DownloadResponse
 	 */
-	function getAll(int $limit, $offset, $params = null): \Sellastica\Connector\Model\DownloadResponse;
+	function getAll(int $limit, $offset, OptionsRequest $params = null): DownloadResponse;
 
 	/**
 	 * @param int $limit
 	 * @param mixed $offset
 	 * @param \DateTime $sinceWhen
-	 * @param array $params
-	 * @return \Sellastica\Connector\Model\DownloadResponse
+	 * @param OptionsRequest|null $params
+	 * @return DownloadResponse
 	 */
-	function getModified(int $limit, $offset, ?\DateTime $sinceWhen, $params = null): \Sellastica\Connector\Model\DownloadResponse;
+	function getModified(int $limit, $offset, ?\DateTime $sinceWhen, OptionsRequest $params = null): DownloadResponse;
 
 	/**
 	 * @param int $synchronizationId

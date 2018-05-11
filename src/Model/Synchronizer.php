@@ -6,9 +6,9 @@ use Sellastica\Connector\Logger\Logger;
 
 class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 {
-	/** @var \Sellastica\Connector\Model\DownloadSynchronizer|null */
+	/** @var DownloadSynchronizer|null */
 	private $downloadSynchronizer;
-	/** @var \Sellastica\Connector\Model\UploadSynchronizer|null */
+	/** @var UploadSynchronizer|null */
 	private $uploadSynchronizer;
 	/** @var \Sellastica\Connector\Logger\Logger */
 	private $logger;
@@ -19,14 +19,17 @@ class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 
 
 	/**
-	 * @param array $params
+	 * @param OptionsRequest|null $params
 	 * @param bool $manual
 	 * @throws \Exception
 	 * @throws \InvalidArgumentException
 	 * @throws \Throwable
 	 * @throws \UnexpectedValueException
 	 */
-	public function synchronize($params = null, bool $manual = false)
+	public function synchronize(
+		OptionsRequest $params = null, 
+		bool $manual = false
+	)
 	{
 		if ($this->download && isset($this->downloadSynchronizer)) {
 			$this->downloadSynchronizer->synchronize($params, $manual);
@@ -55,10 +58,14 @@ class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 
 	/**
 	 * @param int $batch
-	 * @param array $params
+	 * @param OptionsRequest|null $params
 	 * @param bool $manual
 	 */
-	public function batch(int $batch, $params = null, bool $manual = false)
+	public function batch(
+		int $batch, 
+		OptionsRequest $params = null, 
+		bool $manual = false
+	)
 	{
 		//download does not have batch
 		if ($this->download && isset($this->downloadSynchronizer)) {
@@ -73,36 +80,36 @@ class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 	}
 
 	/**
-	 * @return \Sellastica\Connector\Model\DownloadSynchronizer|null
+	 * @return DownloadSynchronizer|null
 	 */
-	public function getDownloadSynchronizer(): ?\Sellastica\Connector\Model\DownloadSynchronizer
+	public function getDownloadSynchronizer(): ?DownloadSynchronizer
 	{
 		return $this->downloadSynchronizer;
 	}
 
 	/**
-	 * @param \Sellastica\Connector\Model\DownloadSynchronizer $downloadSynchronizer
+	 * @param DownloadSynchronizer $downloadSynchronizer
 	 * @return Synchronizer
 	 */
-	public function setDownloadSynchronizer(\Sellastica\Connector\Model\DownloadSynchronizer $downloadSynchronizer): Synchronizer
+	public function setDownloadSynchronizer(DownloadSynchronizer $downloadSynchronizer): Synchronizer
 	{
 		$this->downloadSynchronizer = $downloadSynchronizer;
 		return $this;
 	}
 
 	/**
-	 * @return \Sellastica\Connector\Model\UploadSynchronizer|null
+	 * @return UploadSynchronizer|null
 	 */
-	public function getUploadSynchronizer(): ?\Sellastica\Connector\Model\UploadSynchronizer
+	public function getUploadSynchronizer(): ?UploadSynchronizer
 	{
 		return $this->uploadSynchronizer;
 	}
 
 	/**
-	 * @param \Sellastica\Connector\Model\UploadSynchronizer $uploadSynchronizer
+	 * @param UploadSynchronizer $uploadSynchronizer
 	 * @return Synchronizer
 	 */
-	public function setUploadSynchronizer(\Sellastica\Connector\Model\UploadSynchronizer $uploadSynchronizer): Synchronizer
+	public function setUploadSynchronizer(UploadSynchronizer $uploadSynchronizer): Synchronizer
 	{
 		$this->uploadSynchronizer = $uploadSynchronizer;
 		return $this;

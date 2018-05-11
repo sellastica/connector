@@ -1,8 +1,6 @@
 <?php
 namespace Sellastica\Connector\Model;
 
-use Sellastica\Connector\Logger\Logger;
-
 interface IDownloadDataHandler
 {
 	function initialize(): void;
@@ -21,19 +19,19 @@ interface IDownloadDataHandler
 	/**
 	 * @param \Sellastica\Connector\Logger\Logger $logger
 	 */
-	function setLogger(Logger $logger);
+	function setLogger(\Sellastica\Connector\Logger\Logger $logger);
 
 	/**
 	 * @param $data
 	 * @param \DateTime|null $sinceWhen
-	 * @param array $params
-	 * @return \Sellastica\Connector\Model\ConnectorResponse
+	 * @param OptionsRequest|null $params
+	 * @return ConnectorResponse
 	 */
-	function modify($data, ?\DateTime $sinceWhen, $params = null): \Sellastica\Connector\Model\ConnectorResponse;
+	function modify($data, ?\DateTime $sinceWhen, OptionsRequest $params = null): ConnectorResponse;
 
 	/**
 	 * @param string $externalId
-	 * @return \Sellastica\Connector\Model\ConnectorResponse
+	 * @return ConnectorResponse
 	 */
-	function remove(string $externalId): \Sellastica\Connector\Model\ConnectorResponse;
+	function remove(string $externalId): ConnectorResponse;
 }
