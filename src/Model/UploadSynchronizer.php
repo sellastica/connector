@@ -1,24 +1,14 @@
 <?php
 namespace Sellastica\Connector\Model;
 
-use Nette\SmartObject;
-use Sellastica\App\Entity\App;
-use Sellastica\Connector\Exception\IErpConnectorException;
-use Sellastica\Connector\Logger\Logger;
-use Sellastica\Connector\Logger\LoggerFactory;
-use Sellastica\Core\Model\Environment;
-use Sellastica\Entity\Entity\EntityCollection;
-use Sellastica\Entity\Entity\IEntity;
-use Sellastica\Entity\EntityManager;
-
 /**
- * @method onDataFetched(EntityCollection $entities)
- * @method onItemModified(ConnectorResponse $response, IEntity $entity)
+ * @method onDataFetched(\Sellastica\Entity\Entity\EntityCollection $entities)
+ * @method onItemModified(ConnectorResponse $response, \Sellastica\Entity\Entity\IEntity $entity)
  * @method onSynchronizationFinished()
  */
 class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronizer
 {
-	use SmartObject;
+	use \Nette\SmartObject;
 
 	/** maximum number of errors, if only errors occur (no successfull items). If, stop is forced */
 	private const MAX_ERRORS_COUNT = 20;
@@ -48,31 +38,35 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	private $environment;
 	/** @var IIdentifierFactory */
 	private $identifierFactory;
+	/** @var \Nette\Localization\ITranslator */
+	private $translator;
 
 
 	/**
 	 * @param string $identifier
 	 * @param int $processId
-	 * @param App $app
+	 * @param \Sellastica\App\Entity\App $app
 	 * @param IIdentifierFactory $identifierFactory
 	 * @param IUploadDataGetter $dataGetter
 	 * @param IUploadDataHandler $dataHandler
-	 * @param EntityManager $em
+	 * @param \Sellastica\Entity\EntityManager $em
 	 * @param \Sellastica\Connector\Logger\LoggerFactory $loggerFactory
 	 * @param \Sellastica\Monolog\Logger $monolog
 	 * @param \Sellastica\Core\Model\Environment $environment
+	 * @param \Nette\Localization\ITranslator $translator
 	 */
 	public function __construct(
 		string $identifier,
 		int $processId,
-		App $app,
+		\Sellastica\App\Entity\App $app,
 		IIdentifierFactory $identifierFactory,
 		IUploadDataGetter $dataGetter,
 		IUploadDataHandler $dataHandler,
-		EntityManager $em,
-		LoggerFactory $loggerFactory,
+		\Sellastica\Entity\EntityManager $em,
+		\Sellastica\Connector\Logger\LoggerFactory $loggerFactory,
 		\Sellastica\Monolog\Logger $monolog,
-		Environment $environment
+		\Sellastica\Core\Model\Environment $environment,
+		\Nette\Localization\ITranslator $translator
 	)
 	{
 		parent::__construct(
@@ -89,6 +83,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		$this->monolog = $monolog;
 		$this->environment = $environment;
 		$this->identifierFactory = $identifierFactory;
+		$this->translator = $translator;
 	}
 
 	/**
@@ -101,7 +96,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	 * @throws \UnexpectedValueException
 	 */
 	public function synchronize(
-		OptionsRequest $params = null, 
+		OptionsRequest $params = null,
 		bool $manual = false
 	): void
 	{
@@ -139,7 +134,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			$this->onDataFetched($entities);
 			$this->logDataFetched($logger, $entities->count());
 
-			/** @var IEntity $entity */
+			/** @var \Sellastica\Entity\Entity\IEntity $entity */
 			foreach ($entities as $entity) {
 				$totalItems++;
 				set_time_limit(5);
@@ -158,12 +153,13 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 						$errorItems++;
 						if ($errorItems === $totalItems
 							&& $errorItems >= self::MAX_ERRORS_COUNT) {
-							$logger->notice('Uploading stopped, there is too much errors');
+							$logger->notice(
+								$this->translator->translate('core.connector.uploading_stopped_too_much_errors'));
 							$this->finishSynchronizing();
 							break; //foreach
 						}
 					}
-				} catch (IErpConnectorException $e) {
+				} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
 					//all responses with status code >= 400 must throw IErpConnectorException!
 					$logger->add(
 						$e->getCode(),
@@ -224,7 +220,8 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 
 		$logger = $this->loggerFactory->create($synchronization->getId());
 		$logger->clearOldLogEntries();
-		$logger->notice('Uploading single object data to remote system');
+		$logger->notice(
+			$this->translator->translate('core.connector.uploading_single_object_to_remote_system'));
 
 		try {
 			$response = $this->dataHandler->modify(
@@ -243,11 +240,11 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 
 			return $response;
 
-		} catch (IErpConnectorException $e) {
+		} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
 			//all responses with status code >= 400 must throw IErpConnectorException!
 			$logger->add(
 				$e->getCode(),
-				$data instanceof IEntity ? $data->getId() : null,
+				$data instanceof \Sellastica\Entity\Entity\IEntity ? $data->getId() : null,
 				null,
 				null,
 				null,
@@ -301,7 +298,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 					$response = $this->dataHandler->batch($entities);
 					$logger->fromResponse($response, $entities->count());
 					$this->em->flush();
-				} catch (IErpConnectorException $e) {
+				} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
 					//all responses with status code >= 400 must throw IErpConnectorException!
 					$logger->add(
 						$e->getCode(),
@@ -362,35 +359,36 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	}
 
 	/**
-	 * @param Logger $logger
+	 * @param \Sellastica\Connector\Logger\Logger $logger
 	 */
-	private function logDataFetching(Logger $logger): void
+	private function logDataFetching(\Sellastica\Connector\Logger\Logger $logger): void
 	{
-		$notice = 'Fetching data from local storage';
+		$notice = $this->translator->translate('core.connector.fetching_data_from_local_storage');
 		if ($this->changesOnly()) {
-			$notice .= '. Fetching changes only';
+			$notice .= '. ' . $this->translator->translate('core.connector.fetching_changes_only');
 		}
 
 		$logger->notice($notice);
 	}
 
 	/**
-	 * @param Logger $logger
+	 * @param \Sellastica\Connector\Logger\Logger $logger
 	 * @param int $entitiesCount
 	 */
-	private function logDataFetched(Logger $logger, int $entitiesCount): void
+	private function logDataFetched(\Sellastica\Connector\Logger\Logger $logger, int $entitiesCount): void
 	{
-		$logger->notice(sprintf(
-			'%s items fetched%s',
-			$entitiesCount,
-			$entitiesCount ? '. Uploading data to remote system' : ''
-		));
+		$notice = $this->translator->translate('core.connector.count_items_fetched', $entitiesCount);
+		if ($entitiesCount) {
+			$notice .= '. ' . $this->translator->translate('core.connector.uploading_data_to_remote_system');
+		}
+
+		$logger->notice($notice);
 	}
 
 	/**
-	 * @param Logger $logger
+	 * @param \Sellastica\Connector\Logger\Logger $logger
 	 */
-	private function logFinish(Logger $logger): void
+	private function logFinish(\Sellastica\Connector\Logger\Logger $logger): void
 	{
 		$logger->notice('Uploading data to remote system finished');
 	}

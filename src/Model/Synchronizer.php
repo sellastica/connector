@@ -1,9 +1,6 @@
 <?php
 namespace Sellastica\Connector\Model;
 
-use Sellastica\Connector\Exception\IErpConnectorException;
-use Sellastica\Connector\Logger\Logger;
-
 class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 {
 	/** @var DownloadSynchronizer|null */
@@ -42,18 +39,32 @@ class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 
 	/**
 	 * @param $data
-	 * @return \Sellastica\Connector\Model\ConnectorResponse
-	 * @throws \RuntimeException
+	 * @return ConnectorResponse
+	 * @throws \Exception
 	 * @throws \Exception
 	 */
-	public function upload($data): \Sellastica\Connector\Model\ConnectorResponse
+	public function upload($data): ConnectorResponse
 	{
 		if (!isset($this->uploadSynchronizer)) {
-			throw new \RuntimeException('Cannot upload, upload synchronizer is not set');
+			throw new \Exception('Cannot upload, upload synchronizer is not set');
 		}
 
-		$response = $this->uploadSynchronizer->upload($data);
-		return $response;
+		return $this->uploadSynchronizer->upload($data);
+	}
+
+	/**
+	 * @param $id
+	 * @param OptionsRequest|null $params
+	 * @return DownloadResponse
+	 * @throws \Exception
+	 */
+	public function downloadOne($id, OptionsRequest $params = null): DownloadResponse
+	{
+		if (!isset($this->downloadSynchronizer)) {
+			throw new \Exception('Cannot download, download synchronizer is not set');
+		}
+
+		return $this->downloadSynchronizer->downloadOne($id, $params);
 	}
 
 	/**
@@ -136,9 +147,9 @@ class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 	}
 	
 	/**
-	 * @return Logger
+	 * @return \Sellastica\Connector\Logger\Logger
 	 */
-	public function getLogger(): Logger
+	public function getLogger(): \Sellastica\Connector\Logger\Logger
 	{
 		return $this->logger;
 	}
