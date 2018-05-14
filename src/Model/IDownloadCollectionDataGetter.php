@@ -27,6 +27,14 @@ interface IDownloadCollectionDataGetter
 	function getModified(int $limit, $offset, ?\DateTime $sinceWhen, OptionsRequest $params = null): DownloadResponse;
 
 	/**
+	 * @param $id
+	 * @param OptionsRequest|null $params
+	 * @return DownloadResponse
+	 * @throws \Sellastica\Connector\Exception\IErpConnectorException If item not found
+	 */
+	function getOne($id, OptionsRequest $params = null): DownloadResponse;
+
+	/**
 	 * @param int $synchronizationId
 	 */
 	function setProcessId(int $synchronizationId);

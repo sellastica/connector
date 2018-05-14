@@ -390,6 +390,6 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	 */
 	private function logFinish(\Sellastica\Connector\Logger\Logger $logger): void
 	{
-		$logger->notice('Uploading data to remote system finished');
+		$logger->notice($this->translator->translate('core.connector.uploading_data_to_remote_system_finished'));
 	}
 }
