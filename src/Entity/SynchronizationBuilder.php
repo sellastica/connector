@@ -23,6 +23,8 @@ class SynchronizationBuilder implements IBuilder
 	private $target;
 	/** @var \Sellastica\Connector\Model\SynchronizationType */
 	private $type;
+	/** @var \Sellastica\Connector\Model\SynchronizationStatus */
+	private $status;
 	/** @var \DateTime|null */
 	private $changesSince;
 	/** @var mixed */
@@ -31,12 +33,8 @@ class SynchronizationBuilder implements IBuilder
 	private $start;
 	/** @var \DateTime|null */
 	private $end;
-	/** @var bool|null */
-	private $success;
 	/** @var bool */
 	private $manual = false;
-	/** @var bool */
-	private $break = false;
 
 	/**
 	 * @param int $processId
@@ -45,6 +43,7 @@ class SynchronizationBuilder implements IBuilder
 	 * @param string $source
 	 * @param string $target
 	 * @param \Sellastica\Connector\Model\SynchronizationType $type
+	 * @param \Sellastica\Connector\Model\SynchronizationStatus $status
 	 */
 	public function __construct(
 		int $processId,
@@ -52,7 +51,8 @@ class SynchronizationBuilder implements IBuilder
 		\Sellastica\Connector\Model\IIdentifier $identifier,
 		string $source,
 		string $target,
-		\Sellastica\Connector\Model\SynchronizationType $type
+		\Sellastica\Connector\Model\SynchronizationType $type,
+		\Sellastica\Connector\Model\SynchronizationStatus $status
 	)
 	{
 		$this->processId = $processId;
@@ -61,6 +61,7 @@ class SynchronizationBuilder implements IBuilder
 		$this->source = $source;
 		$this->target = $target;
 		$this->type = $type;
+		$this->status = $status;
 	}
 
 	/**
@@ -109,6 +110,14 @@ class SynchronizationBuilder implements IBuilder
 	public function getType(): \Sellastica\Connector\Model\SynchronizationType
 	{
 		return $this->type;
+	}
+
+	/**
+	 * @return \Sellastica\Connector\Model\SynchronizationStatus
+	 */
+	public function getStatus(): \Sellastica\Connector\Model\SynchronizationStatus
+	{
+		return $this->status;
 	}
 
 	/**
@@ -184,24 +193,6 @@ class SynchronizationBuilder implements IBuilder
 	}
 
 	/**
-	 * @return bool|null
-	 */
-	public function getSuccess()
-	{
-		return $this->success;
-	}
-
-	/**
-	 * @param bool|null $success
-	 * @return $this
-	 */
-	public function success(bool $success = null)
-	{
-		$this->success = $success;
-		return $this;
-	}
-
-	/**
 	 * @return bool
 	 */
 	public function getManual(): bool
@@ -216,24 +207,6 @@ class SynchronizationBuilder implements IBuilder
 	public function manual(bool $manual)
 	{
 		$this->manual = $manual;
-		return $this;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getBreak(): bool
-	{
-		return $this->break;
-	}
-
-	/**
-	 * @param bool $break
-	 * @return $this
-	 */
-	public function break(bool $break)
-	{
-		$this->break = $break;
 		return $this;
 	}
 
@@ -260,6 +233,7 @@ class SynchronizationBuilder implements IBuilder
 	 * @param string $source
 	 * @param string $target
 	 * @param \Sellastica\Connector\Model\SynchronizationType $type
+	 * @param \Sellastica\Connector\Model\SynchronizationStatus $status
 	 * @return self
 	 */
 	public static function create(
@@ -268,9 +242,10 @@ class SynchronizationBuilder implements IBuilder
 		\Sellastica\Connector\Model\IIdentifier $identifier,
 		string $source,
 		string $target,
-		\Sellastica\Connector\Model\SynchronizationType $type
+		\Sellastica\Connector\Model\SynchronizationType $type,
+		\Sellastica\Connector\Model\SynchronizationStatus $status
 	): self
 	{
-		return new self($processId, $application, $identifier, $source, $target, $type);
+		return new self($processId, $application, $identifier, $source, $target, $type, $status);
 	}
 }

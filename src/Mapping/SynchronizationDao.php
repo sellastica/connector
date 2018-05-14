@@ -4,7 +4,6 @@ namespace Sellastica\Connector\Mapping;
 use Sellastica\Connector\Entity\Synchronization;
 use Sellastica\Connector\Entity\SynchronizationBuilder;
 use Sellastica\Connector\Entity\SynchronizationCollection;
-use Sellastica\Connector\Model\SynchronizationType;
 use Sellastica\DataGrid\Mapping\TFilterRulesDao;
 use Sellastica\Entity\Entity\EntityCollection;
 use Sellastica\Entity\Entity\IEntity;
@@ -90,7 +89,8 @@ class SynchronizationDao extends \Sellastica\Entity\Mapping\Dao
 			$this->identifierFactory->create($data->identifier),
 			$data->source,
 			$data->target,
-			SynchronizationType::from($data->type)
+			\Sellastica\Connector\Model\SynchronizationType::from($data->type),
+			\Sellastica\Connector\Model\SynchronizationStatus::from($data->status)
 		)->hydrate($data);
 	}
 

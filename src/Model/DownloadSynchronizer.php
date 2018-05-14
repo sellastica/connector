@@ -129,7 +129,8 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 		try {
 			do {
-				if ($synchronization->isBreak()) {
+				if ($synchronization->getStatus()
+					->equals(\Sellastica\Connector\Model\SynchronizationStatus::interrupted())) {
 					break;
 				}
 
@@ -201,7 +202,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 			);
 
 			$synchronization->end();
-			$synchronization->setSuccess(true);
+			$synchronization->setStatus(SynchronizationStatus::success());
 			$this->em->persist($synchronization);
 
 			$this->onSynchronizationFinished($downloadResponse ?? null);
@@ -211,7 +212,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
 			//log synchronization fail
 			$synchronization->end();
-			$synchronization->setSuccess(false);
+			$synchronization->setStatus(SynchronizationStatus::fail());
 			$this->em->persist($synchronization);
 
 			$logger->fromException($e);
@@ -285,7 +286,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 			$this->onOffsetSynchronized($downloadResponse);
 
 			$synchronization->end();
-			$synchronization->setSuccess(true);
+			$synchronization->setStatus(SynchronizationStatus::success());
 			$this->em->persist($synchronization);
 			$this->em->flush();
 
@@ -296,7 +297,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 			//log synchronization fail
 			$synchronization->end();
-			$synchronization->setSuccess(false);
+			$synchronization->setStatus(SynchronizationStatus::fail());
 			$this->em->persist($synchronization);
 
 			$logger->fromException($e);

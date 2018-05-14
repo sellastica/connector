@@ -77,7 +77,10 @@ class SynchronizationDibiMapper extends DibiMapper
 		FilterRuleCollection $rules = null
 	): \Dibi\Fluent
 	{
-		$resource = parent::getAdminResource($configuration);
+		$resource = parent::getAdminResource($configuration)
+			->leftJoin('synchronization_log')
+			->on('synchronization_log.synchronizationId = %n.id', $this->getTableName());
+
 		if (isset($rules)) {
 			if ($rules['application']) {
 				$resource->where('application = %s', $rules['application']->getValue());

@@ -29,6 +29,8 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	private $target;
 	/** @var \Sellastica\Connector\Model\SynchronizationType @required */
 	private $type;
+	/** @var \Sellastica\Connector\Model\SynchronizationStatus @required */
+	private $status;
 	/** @var \DateTime|null @optional */
 	private $changesSince;
 	/** @var mixed @optional */
@@ -37,12 +39,8 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	private $start;
 	/** @var \DateTime|null @optional */
 	private $end;
-	/** @var bool|null @optional */
-	private $success;
 	/** @var bool @optional */
 	private $manual = false;
-	/** @var bool @optional */
-	private $break = false;
 	/** @var LogSummary */
 	private $logSummary;
 
@@ -222,19 +220,19 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	}
 
 	/**
-	 * @return bool|null
+	 * @return \Sellastica\Connector\Model\SynchronizationStatus
 	 */
-	public function getSuccess(): ?bool
+	public function getStatus(): \Sellastica\Connector\Model\SynchronizationStatus
 	{
-		return $this->success;
+		return $this->status;
 	}
 
 	/**
-	 * @param bool $success
+	 * @param \Sellastica\Connector\Model\SynchronizationStatus $status
 	 */
-	public function setSuccess(?bool $success)
+	public function setStatus(\Sellastica\Connector\Model\SynchronizationStatus $status): void
 	{
-		$this->success = $success;
+		$this->status = $status;
 	}
 
 	/**
@@ -254,22 +252,6 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	}
 
 	/**
-	 * @return bool
-	 */
-	public function isBreak(): bool
-	{
-		return $this->relationService->isBreak();
-	}
-
-	/**
-	 * @param bool $break
-	 */
-	public function setBreak(bool $break)
-	{
-		$this->break = $break;
-	}
-
-	/**
 	 * @return array
 	 */
 	public function toArray(): array
@@ -285,7 +267,7 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 			'params' => isset($this->params) ? serialize($this->params) : null,
 			'start' => $this->start,
 			'end' => $this->end,
-			'success' => $this->success,
+			'status' => $this->status->getStatus(),
 			'manual' => $this->manual,
 		]);
 	}

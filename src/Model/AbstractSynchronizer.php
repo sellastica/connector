@@ -108,9 +108,9 @@ abstract class AbstractSynchronizer
 			$identifier,
 			$source,
 			$target,
-			$type
-		)
-			->changesSince($this->getSinceWhenDate($source, $target))
+			$type,
+			SynchronizationStatus::running()
+		)->changesSince($this->getSinceWhenDate($source, $target))
 			->build();
 	}
 

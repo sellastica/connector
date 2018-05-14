@@ -192,7 +192,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		);
 
 		$synchronization->end();
-		$synchronization->setSuccess(true);
+		$synchronization->setStatus(SynchronizationStatus::success());
 		$this->em->persist($synchronization);
 
 		$this->onSynchronizationFinished();
@@ -234,7 +234,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			$logger->save();
 
 			$synchronization->end();
-			$synchronization->setSuccess(true);
+			$synchronization->setStatus(SynchronizationStatus::success());
 			$this->em->persist($synchronization);
 			$this->em->flush(); //perform external ID save in CLI run
 
@@ -254,7 +254,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			$logger->save();
 			//synchronization failed
 			$synchronization->end();
-			$synchronization->setSuccess(false);
+			$synchronization->setStatus(SynchronizationStatus::fail());
 			$this->em->persist($synchronization);
 			//syslog
 			if ($this->environment->isProductionMode()) {
@@ -323,7 +323,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		);
 
 		$synchronization->end();
-		$synchronization->setSuccess(true);
+		$synchronization->setStatus(SynchronizationStatus::success());
 		$this->em->persist($synchronization);
 
 		$this->onSynchronizationFinished();
