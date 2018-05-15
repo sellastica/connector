@@ -12,11 +12,6 @@ interface IDownloadDataHandler
 	function getTarget(): string;
 
 	/**
-	 * @param int $synchronizationId
-	 */
-	function setProcessId(int $synchronizationId);
-
-	/**
 	 * @param \Sellastica\Connector\Logger\Logger $logger
 	 */
 	function setLogger(\Sellastica\Connector\Logger\Logger $logger);

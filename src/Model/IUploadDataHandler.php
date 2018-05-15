@@ -1,9 +1,6 @@
 <?php
 namespace Sellastica\Connector\Model;
 
-use Nette\NotImplementedException;
-use Sellastica\Entity\Entity\EntityCollection;
-
 interface IUploadDataHandler
 {
 	/**
@@ -11,11 +8,6 @@ interface IUploadDataHandler
 	 * @return string
 	 */
 	function getTarget(): string;
-
-	/**
-	 * @param int $processId
-	 */
-	function setProcessId(int $processId);
 
 	/**
 	 * @param $data
@@ -28,7 +20,7 @@ interface IUploadDataHandler
 	/**
 	 * @param \Sellastica\Entity\Entity\EntityCollection $contacts
 	 * @return ConnectorResponse
-	 * @throws NotImplementedException If batch upload is not implemented
+	 * @throws \Sellastica\Connector\Exception\NotImplementedException If batch upload is not implemented
 	 */
-	function batch(EntityCollection $contacts): ConnectorResponse;
+	function batch(\Sellastica\Entity\Entity\EntityCollection $contacts): ConnectorResponse;
 }

@@ -111,9 +111,6 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		$synchronization->start();
 		$this->em->persist($synchronization);
 
-		$this->dataGetter->setProcessId($this->processId);
-		$this->dataHandler->setProcessId($this->processId);
-
 		$logger = $this->loggerFactory->create($synchronization->getId());
 		$logger->clearOldLogEntries();
 		$this->logDataFetching($logger);
@@ -216,8 +213,6 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		$synchronization->start();
 		$this->em->persist($synchronization);
 
-		$this->dataGetter->setProcessId($this->processId);
-
 		$logger = $this->loggerFactory->create($synchronization->getId());
 		$logger->clearOldLogEntries();
 		$logger->notice(
@@ -274,7 +269,6 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		);
 		$synchronization->start();
 		$this->em->persist($synchronization);
-		$this->dataGetter->setProcessId($this->processId);
 
 		$logger = $this->loggerFactory->create($synchronization->getId());
 		$logger->clearOldLogEntries();

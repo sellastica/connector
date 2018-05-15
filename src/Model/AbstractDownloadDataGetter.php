@@ -3,19 +3,9 @@ namespace Sellastica\Connector\Model;
 
 abstract class AbstractDownloadDataGetter implements IDownloadCollectionDataGetter
 {
-	/** @var int */
-	protected $synchronizationId;
 	/** @var mixed */
 	private $lastResponse;
 
-
-	/**
-	 * @param int $synchronizationId
-	 */
-	public function setProcessId(int $synchronizationId)
-	{
-		$this->synchronizationId = $synchronizationId;
-	}
 
 	/**
 	 * @param $response

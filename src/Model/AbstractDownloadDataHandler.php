@@ -1,29 +1,23 @@
 <?php
 namespace Sellastica\Connector\Model;
 
-use Sellastica\App\Entity\App;
-use Sellastica\Connector\Logger\Logger;
-use Sellastica\Entity\EntityManager;
-
 abstract class AbstractDownloadDataHandler implements IDownloadDataHandler
 {
-	/** @var App */
+	/** @var \Sellastica\App\Entity\App */
 	protected $app;
-	/** @var EntityManager */
+	/** @var \Sellastica\Entity\EntityManager */
 	protected $em;
-	/** @var int */
-	protected $synchronizationId;
 	/** @var \Sellastica\Connector\Logger\Logger */
 	protected $logger;
 
 
 	/**
-	 * @param EntityManager $em
 	 * @param \Sellastica\App\Entity\App $app
+	 * @param \Sellastica\Entity\EntityManager $em
 	 */
 	public function __construct(
-		App $app,
-		EntityManager $em
+		\Sellastica\App\Entity\App $app,
+		\Sellastica\Entity\EntityManager $em
 	)
 	{
 		$this->app = $app;
@@ -35,17 +29,9 @@ abstract class AbstractDownloadDataHandler implements IDownloadDataHandler
 	}
 
 	/**
-	 * @param int $synchronizationId
-	 */
-	public function setProcessId(int $synchronizationId)
-	{
-		$this->synchronizationId = $synchronizationId;
-	}
-
-	/**
 	 * @param \Sellastica\Connector\Logger\Logger $logger
 	 */
-	public function setLogger(Logger $logger)
+	public function setLogger(\Sellastica\Connector\Logger\Logger $logger)
 	{
 		$this->logger = $logger;
 	}

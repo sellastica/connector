@@ -104,8 +104,6 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		$this->em->optimizeImports(min($this->itemsPerPage, 100));
 
 		//initialization
-		$this->dataGetter->setProcessId($this->processId);
-		$this->dataHandler->setProcessId($this->processId);
 		$this->dataHandler->initialize();
 
 		//synchronization entity
@@ -236,8 +234,6 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	{
 		//initialization
 		$this->sinceWhen = ISynchronizer::SINCE_EVER;
-		$this->dataGetter->setProcessId($this->processId);
-		$this->dataHandler->setProcessId($this->processId);
 		$this->dataHandler->initialize();
 
 		//synchronization entity

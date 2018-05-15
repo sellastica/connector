@@ -33,9 +33,4 @@ interface IDownloadCollectionDataGetter
 	 * @throws \Sellastica\Connector\Exception\IErpConnectorException If item not found
 	 */
 	function getOne($id, OptionsRequest $params = null): DownloadResponse;
-
-	/**
-	 * @param int $synchronizationId
-	 */
-	function setProcessId(int $synchronizationId);
 }

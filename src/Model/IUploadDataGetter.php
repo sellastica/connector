@@ -12,11 +12,6 @@ interface IUploadDataGetter
 	function getSource(): string;
 
 	/**
-	 * @param int $synchronizationId
-	 */
-	function setProcessId(int $synchronizationId);
-
-	/**
 	 * @param int $limit
 	 * @param int $offset
 	 * @param OptionsRequest|null $params
