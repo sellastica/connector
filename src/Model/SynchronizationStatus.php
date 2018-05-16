@@ -58,6 +58,46 @@ class SynchronizationStatus
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isPending(): bool
+	{
+		return $this->status === self::PENDING;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isRunning(): bool
+	{
+		return $this->status === self::RUNNING;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isSuccess(): bool
+	{
+		return $this->status === self::SUCCESS;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isFail(): bool
+	{
+		return $this->status === self::FAIL;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isInterrupted(): bool
+	{
+		return $this->status === self::INTERRUPTED;
+	}
+
+	/**
 	 * @param SynchronizationStatus $status
 	 * @return bool
 	 */
