@@ -148,9 +148,9 @@ class SynchronizationLogDibiMapper extends \Sellastica\Entity\Mapping\DibiMapper
 			//record type
 			if ($rules['record_type']) {
 				if ($rules['record_type']->getValue() === 'notice') {
-					$resource->where('%n.internalId IS NULL', $this->getTableName());
+					$resource->where('%n.statusCode IS NULL', $this->getTableName());
 				} else {
-					$resource->where('%n.internalId IS NOT NULL', $this->getTableName());
+					$resource->where('%n.statusCode IS NOT NULL', $this->getTableName());
 				}
 			}
 		}
