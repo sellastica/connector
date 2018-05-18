@@ -294,7 +294,8 @@ class SynchronizationLog extends AbstractEntity
 		return !$this->getInternalId()
 			&& !$this->getRemoteId()
 			&& !$this->getCode()
-			&& $this->getDescription();
+			&& $this->getDescription()
+			&& $this->statusCode === null;
 	}
 
 	/**
