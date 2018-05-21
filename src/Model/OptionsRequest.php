@@ -54,7 +54,12 @@ class OptionsRequest
 	 */
 	public function addFilter($key, $value): OptionsRequest
 	{
-		$this->filters[$key] = $value;
+		if (isset($key)) {
+			$this->filters[$key] = $value;
+		} else {
+			$this->filters[] = $value;
+		}
+
 		return $this;
 	}
 
