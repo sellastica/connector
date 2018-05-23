@@ -9,12 +9,16 @@ trait TRepository
 {
 	/**
 	 * @param string $column
+	 * @param \Sellastica\Entity\Configuration|null $configuration
 	 * @return \Sellastica\Entity\Entity\EntityCollection
 	 */
-	public function findModifiedItems(string $column): \Sellastica\Entity\Entity\EntityCollection
+	public function findModifiedItems(
+		string $column,
+		\Sellastica\Entity\Configuration $configuration = null
+	): \Sellastica\Entity\Entity\EntityCollection
 	{
 		return $this->initialize(
-			$this->dao->findModifiedItems($column)
+			$this->dao->findModifiedItems($column, $configuration)
 		);
 	}
 

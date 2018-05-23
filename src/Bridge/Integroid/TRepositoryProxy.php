@@ -6,9 +6,12 @@ namespace Sellastica\Connector\Bridge\Integroid;
  */
 trait TRepositoryProxy
 {
-	public function findModifiedItems(string $column): \Sellastica\Entity\Entity\EntityCollection
+	public function findModifiedItems(
+		string $column,
+		\Sellastica\Entity\Configuration $configuration = null
+	): \Sellastica\Entity\Entity\EntityCollection
 	{
-		return $this->getRepository()->findModifiedItems($column);
+		return $this->getRepository()->findModifiedItems($column, $configuration);
 	}
 
 	public function findLastModifiedItem(string $column): ?\Sellastica\Entity\Entity\IEntity

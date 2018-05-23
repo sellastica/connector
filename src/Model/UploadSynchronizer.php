@@ -119,85 +119,94 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		$totalItems = 0;
 		$errorItems = 0;
 
-		do {
-			//get local data for upload
-			set_time_limit(20);
-			$entities = $this->changesOnly()
-				? $this->dataGetter->getChanges($this->itemsPerPage, $this->offset, $this->params, $synchronization->getChangesSince())
-				: $this->dataGetter->getAll($this->itemsPerPage, $this->offset, $this->params);
+		try {
+			do {
+				//get local data for upload
+				set_time_limit(20);
+				$entities = $this->changesOnly()
+					? $this->dataGetter->getChanges($this->itemsPerPage, $this->offset, $this->params, $synchronization->getChangesSince())
+					: $this->dataGetter->getAll($this->itemsPerPage, $this->offset, $this->params);
 
-			//change offset
-			$this->offset = (int)$this->offset + $this->itemsPerPage;
-			$this->onDataFetched($entities);
-			$this->logDataFetched($logger, $entities->count());
+				//change offset
+				$this->offset = (int)$this->offset + $this->itemsPerPage;
+				$this->onDataFetched($entities);
+				$this->logDataFetched($logger, $entities->count());
 
-			/** @var \Sellastica\Entity\Entity\IEntity $entity */
-			foreach ($entities as $entity) {
-				$totalItems++;
-				set_time_limit(5);
-				try {
-					//upload remote data to ERP
-					$response = $this->dataHandler->modify(
-						$entity, $synchronization->getChangesSince(), $this->params
-					);
-					$this->onItemModified($response, $entity);
-
-					$logger->fromResponse($response);
-					$this->em->flush();
-
-					//force finish if there is too much errors
-					if (!$response->isSuccessfull()) {
-						$errorItems++;
-						if ($errorItems === $totalItems
-							&& $errorItems >= self::MAX_ERRORS_COUNT) {
-							$logger->notice(
-								$this->translator->translate('core.connector.uploading_stopped_too_much_errors'));
-							$this->finishSynchronizing();
-							break; //foreach
-						}
-					}
-				} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
-					//all responses with status code >= 400 must throw IErpConnectorException!
-					$logger->add(
-						$e->getCode(),
-						$entity->getId(),
-						null,
-						null,
-						null,
-						$e->getMessage()
-					);
-					$logger->save();
-					//syslog
-					if ($this->environment->isProductionMode()) {
-						$this->monolog->exception(
-							$e, sprintf('%s [%s]', $e->getMessage(), $entity->getId())
+				/** @var \Sellastica\Entity\Entity\IEntity $entity */
+				foreach ($entities as $entity) {
+					$totalItems++;
+					set_time_limit(5);
+					try {
+						//upload remote data to ERP
+						$response = $this->dataHandler->modify(
+							$entity, $synchronization->getChangesSince(), $this->params
 						);
-						if ($e instanceof \Sellastica\Connector\Exception\AbortException) {
-							break(2); //foreach and while
+						$this->onItemModified($response, $entity);
+
+						$logger->fromResponse($response);
+						$this->em->flush();
+
+						//force finish if there is too much errors
+						if (!$response->isSuccessfull()) {
+							$errorItems++;
+							if ($errorItems === $totalItems
+								&& $errorItems >= self::MAX_ERRORS_COUNT) {
+								$logger->notice(
+									$this->translator->translate('core.connector.uploading_stopped_too_much_errors'));
+								$this->finishSynchronizing();
+								break; //foreach
+							}
 						}
-					} else {
-						throw $e;
+					} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
+						//all responses with status code >= 400 must throw IErpConnectorException!
+						$logger->add(
+							$e->getCode(),
+							$entity->getId(),
+							null,
+							null,
+							null,
+							$e->getMessage()
+						);
+						$logger->save();
+						//syslog
+						if ($this->environment->isProductionMode()) {
+							$this->monolog->exception(
+								$e, sprintf('%s [%s]', $e->getMessage(), $entity->getId())
+							);
+							if ($e instanceof \Sellastica\Connector\Exception\AbortException) {
+								break(2); //foreach and while
+							}
+						} else {
+							throw $e;
+						}
 					}
 				}
+
+				$logger->save(); //save after each iteration
+				$this->onOffsetSynchronized();
+			} while (
+				$entities->count()
+				&& $this->finishSynchronizing !== true
+			);
+
+			$synchronization->setStatus(SynchronizationStatus::success());
+			if ($entities->count()) {
+				$this->logFinish($logger);
 			}
 
-			$logger->save(); //save after each iteration
-			$this->onOffsetSynchronized();
-		} while (
-			$entities->count()
-			&& $this->finishSynchronizing !== true
-		);
+		} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
+			$synchronization->setStatus(SynchronizationStatus::fail());
+			$logger->notice(
+				$e->getMessage()
+			);
+			$logger->save();
+		}
 
 		$synchronization->end();
-		$synchronization->setStatus(SynchronizationStatus::success());
 		$this->em->persist($synchronization);
 
 		$this->onSynchronizationFinished();
 		$this->em->flush(); //flush changes after event
-
-		if ($entities->count()) {
-			$this->logFinish($logger);
-		}
 	}
 
 	/**

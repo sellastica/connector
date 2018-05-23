@@ -10,12 +10,16 @@ trait TDao
 {
 	/**
 	 * @param string $column
+	 * @param \Sellastica\Entity\Configuration|null $configuration
 	 * @return \Sellastica\Entity\Entity\EntityCollection
 	 */
-	public function findModifiedItems(string $column): \Sellastica\Entity\Entity\EntityCollection
+	public function findModifiedItems(
+		string $column,
+		\Sellastica\Entity\Configuration $configuration = null
+	): \Sellastica\Entity\Entity\EntityCollection
 	{
 		return $this->getEntitiesFromCacheOrStorage(
-			$this->mapper->findModifiedItems($column)
+			$this->mapper->findModifiedItems($column, $configuration)
 		);
 	}
 

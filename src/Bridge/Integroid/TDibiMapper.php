@@ -8,13 +8,19 @@ trait TDibiMapper
 {
 	/**
 	 * @param string $column
+	 * @param \Sellastica\Entity\Configuration|null $configuration
 	 * @return array
 	 */
-	public function findModifiedItems(string $column): array
+	public function findModifiedItems(string $column, \Sellastica\Entity\Configuration $configuration = null): array
 	{
-		return $this->getResourceWithIds()
-			->where('modified > %n', $column)
-			->fetchPairs();
+		$resource = $this->getResourceWithIds()
+			->where('modified > %n', $column);
+
+		if ($configuration) {
+			$this->applyConfiguration($resource, $configuration);
+		}
+
+		return $resource->fetchPairs();
 	}
 
 	/**
