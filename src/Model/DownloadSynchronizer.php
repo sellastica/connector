@@ -217,13 +217,17 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 			$this->em->flush(); //flush changes after event
 			$this->restoreMemoryLimit();
 
-		} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
+		} catch (\Sellastica\Connector\Exception\IErpConnectorException | \Exception $e) {
 			//log synchronization fail
 			$synchronization->end();
 			$synchronization->setStatus(SynchronizationStatus::fail());
 			$this->em->persist($synchronization);
 
-			$logger->fromException($e);
+			//log exception - IErpConnectorException message can be logged
+			if ($e instanceof \Sellastica\Connector\Exception\IErpConnectorException) {
+				$logger->fromException($e);
+			}
+
 			$logger->save();
 			$this->restoreMemoryLimit();
 			throw $e;
