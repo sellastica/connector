@@ -27,6 +27,10 @@ abstract class AbstractSynchronizer
 	protected $em;
 	/** @var IIdentifierFactory */
 	private $identifierFactory;
+	/** @var string */
+	private $defaultMemoryLimit;
+	/** @var string */
+	private $memoryLimit;
 
 
 	/**
@@ -49,6 +53,7 @@ abstract class AbstractSynchronizer
 		$this->em = $em;
 		$this->processId = $processId;
 		$this->identifierFactory = $identifierFactory;
+		$this->defaultMemoryLimit = ini_get('memory_limit');
 	}
 
 	public function finishSynchronizing()
@@ -86,6 +91,20 @@ abstract class AbstractSynchronizer
 	public function setParams($params)
 	{
 		$this->params = $params;
+	}
+
+	/**
+	 * @param int $mb
+	 */
+	public function setMemoryLimit(int $mb): void
+	{
+		$this->memoryLimit = $mb . 'M';
+		ini_set('memory_limit', $this->memoryLimit);
+	}
+
+	public function restoreMemoryLimit(): void
+	{
+		ini_set('memory_limit', $this->defaultMemoryLimit);
 	}
 
 	/**

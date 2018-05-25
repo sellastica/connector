@@ -5,7 +5,7 @@ class DownloadResponse
 {
 	/** @var mixed */
 	private $clientReponse;
-	/** @var array */
+	/** @var iterable */
 	private $data;
 	/** @var array */
 	private $externalIdsToRemove = [];
@@ -13,9 +13,9 @@ class DownloadResponse
 
 	/**
 	 * @param mixed $clientReponse
-	 * @param array $data
+	 * @param iterable $data
 	 */
-	public function __construct($clientReponse, array $data)
+	public function __construct($clientReponse, iterable $data)
 	{
 		$this->clientReponse = $clientReponse;
 		$this->data = $data;
@@ -30,9 +30,9 @@ class DownloadResponse
 	}
 
 	/**
-	 * @return array
+	 * @return iterable
 	 */
-	public function getData(): array
+	public function getData(): iterable
 	{
 		return $this->data;
 	}

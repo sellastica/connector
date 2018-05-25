@@ -152,11 +152,13 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 					$dataCount ? 'core.connector.number_of_items_fetched' : 'core.connector.no_items_fetched',
 					$dataCount
 				));
-				if ($downloadResponse->getData() !== null) {
+				if ($downloadResponse->getData() !== null
+					&& is_array($downloadResponse->getData())) {
 					$item->setSourceData(serialize($downloadResponse->getData()));
 				}
 
 				//items to create or update
+				$iteration = 0;
 				foreach ($downloadResponse->getData() as $itemData) {
 					set_time_limit(10);
 					//set data to local items
@@ -171,9 +173,16 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 					if ($response->getStatusCode() !== ConnectorResponse::IGNORED) {
 						$logger->fromResponse($response);
 					}
+
+					if ($iteration % 100 === 0) {
+						$logger->save();
+						}
+
+					$iteration++;
 				}
 
-				if (sizeof($downloadResponse->getData())) {
+				if ((is_array($downloadResponse->getData()) || $downloadResponse->getData() instanceof \Countable)
+					&& sizeof($downloadResponse->getData())) {
 					$logger->notice($this->translator->translate('core.connector.processing_data_finished'));
 				}
 
@@ -206,6 +215,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 			$this->onSynchronizationFinished($downloadResponse ?? null);
 			$this->eventDispatcher->dispatchEvent('connector.synchronization.finished');
 			$this->em->flush(); //flush changes after event
+			$this->restoreMemoryLimit();
 
 		} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
 			//log synchronization fail
@@ -215,6 +225,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 			$logger->fromException($e);
 			$logger->save();
+			$this->restoreMemoryLimit();
 			throw $e;
 		}
 	}
