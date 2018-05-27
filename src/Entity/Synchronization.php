@@ -41,6 +41,8 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	private $end;
 	/** @var bool @optional */
 	private $manual = false;
+	/** @var string|null @optional */
+	private $note;
 	/** @var LogSummary */
 	private $logSummary;
 
@@ -252,6 +254,22 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 	}
 
 	/**
+	 * @return null|string
+	 */
+	public function getNote(): ?string
+	{
+		return $this->note;
+	}
+
+	/**
+	 * @param null|string $note
+	 */
+	public function setNote(?string $note): void
+	{
+		$this->note = $note;
+	}
+
+	/**
 	 * @return array
 	 */
 	public function toArray(): array
@@ -269,6 +287,7 @@ class Synchronization extends AbstractEntity implements IAggregateRoot
 			'end' => $this->end,
 			'status' => $this->status->getStatus(),
 			'manual' => $this->manual,
+			'note' => $this->note,
 		]);
 	}
 }

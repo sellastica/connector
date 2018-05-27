@@ -38,8 +38,6 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	private $offset = 0;
 	/** @var \Sellastica\Events\EventDispatcher */
 	private $eventDispatcher;
-	/** @var \Nette\Localization\ITranslator */
-	private $translator;
 	/** @var \Sellastica\Core\Model\Environment */
 	private $environment;
 
@@ -76,13 +74,13 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 			$processId,
 			$app,
 			$em,
-			$identifierFactory
+			$identifierFactory,
+			$translator
 		);
 		$this->dataGetter = $dataGetter;
 		$this->dataHandler = $dataHandler;
 		$this->loggerFactory = $loggerFactory;
 		$this->eventDispatcher = $eventDispatcher;
-		$this->translator = $translator;
 		$this->environment = $environment;
 	}
 
@@ -176,8 +174,10 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 					if ($iteration % 100 === 0) {
 						$logger->save();
-						}
+					}
 
+					//memory limit check
+					$this->checkMemoryLimit();
 					$iteration++;
 				}
 
@@ -225,7 +225,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 			//log exception - IErpConnectorException message can be logged
 			if ($e instanceof \Sellastica\Connector\Exception\IErpConnectorException) {
-				$logger->fromException($e);
+				$synchronization->setNote($e->getMessage());
 			}
 
 			$logger->save();

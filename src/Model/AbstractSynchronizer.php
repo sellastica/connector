@@ -27,10 +27,12 @@ abstract class AbstractSynchronizer
 	protected $em;
 	/** @var IIdentifierFactory */
 	private $identifierFactory;
-	/** @var string */
+	/** @var string e.g. 128M */
 	private $defaultMemoryLimit;
-	/** @var string */
-	private $memoryLimit;
+	/** @var int Memory limit in bytes */
+	protected $memoryLimit;
+	/** @var \Nette\Localization\ITranslator */
+	protected $translator;
 
 
 	/**
@@ -39,13 +41,15 @@ abstract class AbstractSynchronizer
 	 * @param App $app
 	 * @param \Sellastica\Entity\EntityManager $em
 	 * @param IIdentifierFactory $identifierFactory
+	 * @param \Nette\Localization\ITranslator $translator
 	 */
 	public function __construct(
 		string $identifier,
 		int $processId,
 		App $app,
 		EntityManager $em,
-		IIdentifierFactory $identifierFactory
+		IIdentifierFactory $identifierFactory,
+		\Nette\Localization\ITranslator $translator
 	)
 	{
 		$this->app = $app;
@@ -53,7 +57,13 @@ abstract class AbstractSynchronizer
 		$this->em = $em;
 		$this->processId = $processId;
 		$this->identifierFactory = $identifierFactory;
+		$this->translator = $translator;
+
+		//memory limit
 		$this->defaultMemoryLimit = ini_get('memory_limit');
+		$configuration = new \BrandEmbassy\Memory\MemoryConfiguration();
+		$limitProvider = new \BrandEmbassy\Memory\MemoryLimitProvider($configuration);
+		$this->memoryLimit = $limitProvider->getLimitInBytes();
 	}
 
 	public function finishSynchronizing()
@@ -98,8 +108,8 @@ abstract class AbstractSynchronizer
 	 */
 	public function setMemoryLimit(int $mb): void
 	{
-		$this->memoryLimit = $mb . 'M';
-		ini_set('memory_limit', $this->memoryLimit);
+		$this->memoryLimit = $mb * 1024 * 1024;
+		ini_set('memory_limit', $mb . 'M');
 	}
 
 	public function restoreMemoryLimit(): void
@@ -172,6 +182,18 @@ abstract class AbstractSynchronizer
 			default:
 				throw new \UnexpectedValueException("Unexpected value $this->sinceWhen");
 				break;
+		}
+	}
+
+	/**
+	 * @throws \Sellastica\Connector\Exception\AbortException
+	 */
+	protected function checkMemoryLimit()
+	{
+		if ($this->memoryLimit > 0 && $this->memoryLimit * 0.9 < memory_get_usage()) {
+			throw new \Sellastica\Connector\Exception\AbortException(
+				$this->translator->translate('core.connector.notices.memory_usage_exceeded')
+			);
 		}
 	}
 }

@@ -38,8 +38,6 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	private $environment;
 	/** @var IIdentifierFactory */
 	private $identifierFactory;
-	/** @var \Nette\Localization\ITranslator */
-	private $translator;
 
 
 	/**
@@ -74,7 +72,8 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			$processId,
 			$app,
 			$em,
-			$identifierFactory
+			$identifierFactory,
+			$translator
 		);
 		$this->dataHandler = $dataHandler;
 		$this->em = $em;
@@ -83,7 +82,6 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		$this->monolog = $monolog;
 		$this->environment = $environment;
 		$this->identifierFactory = $identifierFactory;
-		$this->translator = $translator;
 	}
 
 	/**
