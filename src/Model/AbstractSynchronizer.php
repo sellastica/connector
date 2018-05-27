@@ -190,7 +190,7 @@ abstract class AbstractSynchronizer
 	 */
 	protected function checkMemoryLimit()
 	{
-		if ($this->memoryLimit > 0 && $this->memoryLimit * 0.9 < memory_get_usage()) {
+		if ($this->memoryLimit > 0 && $this->memoryLimit * 0.85 < memory_get_usage()) {
 			throw new \Sellastica\Connector\Exception\AbortException(
 				$this->translator->translate('core.connector.notices.memory_usage_exceeded')
 			);
