@@ -125,11 +125,6 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 		try {
 			do {
-				if ($synchronization->getStatus()
-					->equals(\Sellastica\Connector\Model\SynchronizationStatus::interrupted())) {
-					break;
-				}
-
 				$logger->notice($this->translator->translate(
 					'core.connector.trying_to_download_items', $this->itemsPerPage
 				));
@@ -158,6 +153,9 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 				//items to create or update
 				$iteration = 0;
 				foreach ($downloadResponse->getData() as $itemData) {
+					//check manual interruption
+					$this->checkManualInterruption($synchronization->getId());
+
 					set_time_limit(10);
 					//set data to local items
 					$response = $this->dataHandler->modify(
@@ -192,6 +190,9 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 						'removing_number_of_items', sizeof($downloadResponse->getExternalIdsToRemove())
 					));
 					foreach ($downloadResponse->getExternalIdsToRemove() as $externalId) {
+						//check manual interruption
+						$this->checkManualInterruption($synchronization->getId());
+
 						$response = $this->dataHandler->remove($externalId);
 						$this->onItemRemoved($response, $externalId);
 						$logger->fromResponse($response);
@@ -220,7 +221,12 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		} catch (\Sellastica\Connector\Exception\IErpConnectorException | \Exception $e) {
 			//log synchronization fail
 			$synchronization->end();
-			$synchronization->setStatus(SynchronizationStatus::fail());
+			if ($e instanceof \Sellastica\Connector\Exception\AbortException) {
+				$synchronization->setStatus(SynchronizationStatus::interrupted());
+			} elseif (!$synchronization->getStatus()->isInterrupted()) {
+				$synchronization->setStatus(SynchronizationStatus::fail());
+			}
+
 			$this->em->persist($synchronization);
 
 			//log exception - IErpConnectorException message can be logged
@@ -365,5 +371,22 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	public function getDataHandler(): IDownloadDataHandler
 	{
 		return $this->dataHandler;
+	}
+
+	/**
+	 * @param int $synchronizationId
+	 * @throws \Sellastica\Connector\Exception\AbortException
+	 */
+	private function checkManualInterruption(int $synchronizationId): void
+	{
+		$status = SynchronizationStatus::from(
+			$this->em->getRepository(\Sellastica\Connector\Entity\Synchronization::class)
+			->findField($synchronizationId, 'status')
+		);
+		if ($status->isInterrupted()) {
+			throw new \Sellastica\Connector\Exception\AbortException(
+				$this->translator->translate('core.connector.notices.manually_interrupted')
+			);
+		}
 	}
 }
