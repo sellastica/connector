@@ -158,25 +158,25 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 				//items to create or update
 				$iteration = 0;
 				foreach ($downloadResponse->getData() as $itemData) {
-					//check manual interruption
-					$this->checkManualInterruption($synchronization->getId());
-
 					set_time_limit(10);
 					//set data to local items
 					$response = $this->dataHandler->modify(
 						$itemData, $synchronization->getChangesSince(), $this->params
 					);
-					if (!$response->getSourceData()) {
-						$response->setSourceData($itemData);
-					}
 
 					$this->onItemModified($response, $itemData);
 					if ($response->getStatusCode() !== ConnectorResponse::IGNORED) {
+						if (!$response->getSourceData()) {
+							$response->setSourceData($itemData);
+						}
+
 						$logger->fromResponse($response);
 					}
 
 					if ($iteration % 100 === 0) {
 						$logger->save();
+						//check manual interruption
+						$this->checkManualInterruption($synchronization->getId());
 					}
 
 					//memory limit check
