@@ -35,6 +35,8 @@ class SynchronizationBuilder implements IBuilder
 	private $end;
 	/** @var bool */
 	private $manual = false;
+	/** @var string|null */
+	private $note;
 
 	/**
 	 * @param int $processId
@@ -207,6 +209,24 @@ class SynchronizationBuilder implements IBuilder
 	public function manual(bool $manual)
 	{
 		$this->manual = $manual;
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getNote()
+	{
+		return $this->note;
+	}
+
+	/**
+	 * @param string|null $note
+	 * @return $this
+	 */
+	public function note(string $note = null)
+	{
+		$this->note = $note;
 		return $this;
 	}
 
