@@ -89,4 +89,20 @@ class SynchronizationDibiMapper extends DibiMapper
 
 		return $resource;
 	}
+
+	/**
+	 * @param \DateTime $dateTime
+	 * @param string|null $identifier
+	 */
+	public function clearOldLogEntries(\DateTime $dateTime, string $identifier = null): void
+	{
+		$resource = $this->database->delete($this->getTableName(true))
+			->where('created < %t', $dateTime);
+
+		if ($identifier) {
+			$resource->where('identifier = %s', $identifier);
+		}
+
+		$resource->execute();
+	}
 }

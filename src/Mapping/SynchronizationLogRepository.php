@@ -23,15 +23,6 @@ class SynchronizationLogRepository extends \Sellastica\Entity\Mapping\Repository
 	}
 
 	/**
-	 * @param \DateTime $dateTime
-	 * @return void
-	 */
-	public function clearOldLogEntries(\DateTime $dateTime)
-	{
-		$this->dao->clearOldLogEntries($dateTime);
-	}
-
-	/**
 	 * @param string $application
 	 * @param string $identifier
 	 * @param int $internalId

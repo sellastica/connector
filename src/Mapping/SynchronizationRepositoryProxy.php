@@ -33,4 +33,9 @@ class SynchronizationRepositoryProxy extends \Sellastica\Entity\Mapping\Reposito
 	{
 		return $this->getRepository()->getLastUpload($application, $identifier, $source, $target, $types);
 	}
+
+	public function clearOldLogEntries(\DateTime $dateTime, string $identifier = null): void
+	{
+		$this->getRepository()->clearOldLogEntries($dateTime, $identifier);
+	}
 }

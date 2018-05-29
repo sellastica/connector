@@ -67,17 +67,6 @@ class SynchronizationLogDibiMapper extends \Sellastica\Entity\Mapping\DibiMapper
 	}
 
 	/**
-	 * @param \DateTime $dateTime
-	 * @return void
-	 */
-	public function clearOldLogEntries(\DateTime $dateTime)
-	{
-		$this->database->delete($this->getTableName(true))
-			->where('dateTime < %t', $dateTime)
-			->execute();
-	}
-
-	/**
 	 * @param string $application
 	 * @param string $identifier
 	 * @param int $internalId

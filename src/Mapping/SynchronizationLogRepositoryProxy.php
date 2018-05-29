@@ -19,11 +19,6 @@ class SynchronizationLogRepositoryProxy extends RepositoryProxy implements ISync
 		return $this->getRepository()->getNumberOfRecordsBy($filterValues);
 	}
 
-	public function clearOldLogEntries(\DateTime $dateTime)
-	{
-		$this->getRepository()->clearOldLogEntries($dateTime);
-	}
-
 	public function findByInternalId(
 		string $application,
 		string $identifier,

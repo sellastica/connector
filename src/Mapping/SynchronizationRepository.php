@@ -49,4 +49,14 @@ class SynchronizationRepository extends Repository implements ISynchronizationRe
 	{
 		return $this->initialize($this->dao->getLastUpload($application, $identifier, $source, $target, $types));
 	}
+
+	/**
+	 * @param \DateTime $dateTime
+	 * @param string|null $identifier
+	 * @return void
+	 */
+	public function clearOldLogEntries(\DateTime $dateTime, string $identifier = null): void
+	{
+		$this->dao->clearOldLogEntries($dateTime, $identifier);
+	}
 }

@@ -27,15 +27,6 @@ class SynchronizationLogDao extends Dao
 	}
 
 	/**
-	 * @param \DateTime $dateTime
-	 * @return void
-	 */
-	public function clearOldLogEntries(\DateTime $dateTime)
-	{
-		$this->mapper->clearOldLogEntries($dateTime);
-	}
-
-	/**
 	 * @param string $application
 	 * @param string $identifier
 	 * @param int $internalId

@@ -40,6 +40,8 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	private $eventDispatcher;
 	/** @var \Sellastica\Core\Model\Environment */
 	private $environment;
+	/** @var string */
+	private $lookupHistory = '-1 week';
 
 
 	/**
@@ -120,8 +122,11 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		$this->em->flush();
 
 		$logger = $this->loggerFactory->create($synchronization->getId());
-		$logger->clearOldLogEntries();
 		$this->dataHandler->setLogger($logger);
+		//clear records with current identifier older than lookup history
+		$logger->clearOldLogEntries($this->lookupHistory, $this->identifier);
+		//clear all records older than 1 week
+		$logger->clearOldLogEntries('-1 week');
 
 		try {
 			do {
@@ -272,8 +277,11 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		$this->em->flush();
 
 		$logger = $this->loggerFactory->create($synchronization->getId());
-		$logger->clearOldLogEntries();
 		$this->dataHandler->setLogger($logger);
+		//clear records with current identifier older than lookup history
+		$logger->clearOldLogEntries($this->lookupHistory, $this->identifier);
+		//clear all records older than 1 week
+		$logger->clearOldLogEntries('-1 week');
 
 		$logger->notice($this->translator->translate('core.connector.trying_to_download_sigle_item'));
 
@@ -322,6 +330,14 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 			throw $e;
 		}
+	}
+
+	/**
+	 * @param string $lookupHistory
+	 */
+	public function setLookupHistory(string $lookupHistory): void
+	{
+		$this->lookupHistory = $lookupHistory;
 	}
 
 	/**
@@ -379,11 +395,9 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	 */
 	private function checkManualInterruption(int $synchronizationId): void
 	{
-		$status = SynchronizationStatus::from(
-			$this->em->getRepository(\Sellastica\Connector\Entity\Synchronization::class)
-			->findField($synchronizationId, 'status')
-		);
-		if ($status->isInterrupted()) {
+		$status = $this->em->getRepository(\Sellastica\Connector\Entity\Synchronization::class)
+			->findField($synchronizationId, 'status');
+		if ($status === SynchronizationStatus::INTERRUPTED) {
 			throw new \Sellastica\Connector\Exception\AbortException(
 				$this->translator->translate('core.connector.notices.manually_interrupted')
 			);

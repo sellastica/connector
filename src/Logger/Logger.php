@@ -1,16 +1,11 @@
 <?php
 namespace Sellastica\Connector\Logger;
 
-use Sellastica\Connector\Entity\SynchronizationLog;
-use Sellastica\Connector\Entity\SynchronizationLogBuilder;
-use Sellastica\Connector\Model\ConnectorResponse;
-use Sellastica\Entity\EntityManager;
-
 class Logger
 {
 	/** @var int */
 	private $synchronizationId;
-	/** @var EntityManager */
+	/** @var \Sellastica\Entity\EntityManager */
 	private $em;
 	/** @var \Sellastica\Connector\Entity\SynchronizationLog[] */
 	private $items = [];
@@ -18,11 +13,11 @@ class Logger
 
 	/**
 	 * @param int $synchronizationId
-	 * @param EntityManager $em
+	 * @param \Sellastica\Entity\EntityManager $em
 	 */
 	public function __construct(
 		int $synchronizationId,
-		EntityManager $em
+		\Sellastica\Entity\EntityManager $em
 	)
 	{
 		$this->synchronizationId = $synchronizationId;
@@ -38,7 +33,7 @@ class Logger
 	 * @param array|string|null $description
 	 * @param string|null $sourceData
 	 * @param string|null $resultData
-	 * @return SynchronizationLog
+	 * @return \Sellastica\Connector\Entity\SynchronizationLog
 	 */
 	public function add(
 		int $statusCode = null,
@@ -49,13 +44,14 @@ class Logger
 		$description = null,
 		$sourceData = null,
 		$resultData = null
-	): SynchronizationLog
+	): \Sellastica\Connector\Entity\SynchronizationLog
 	{
 		if (is_array($description)) {
 			$description = implode(PHP_EOL, array_filter($description));
 		}
 
-		$this->items[] = $item = SynchronizationLogBuilder::create($this->synchronizationId, new \DateTime())
+		$this->items[] = $item = \Sellastica\Connector\Entity\SynchronizationLogBuilder::create(
+			$this->synchronizationId, new \DateTime())
 			->statusCode($statusCode)
 			->internalId($internalId)
 			->remoteId($remoteId)
@@ -70,10 +66,13 @@ class Logger
 	}
 
 	/**
-	 * @param ConnectorResponse $response
+	 * @param \Sellastica\Connector\Model\ConnectorResponse $response
 	 * @param int $count Used in batch synchronizations
 	 */
-	public function fromResponse(ConnectorResponse $response, int $count = 1): void
+	public function fromResponse(
+		\Sellastica\Connector\Model\ConnectorResponse $response,
+		int $count = 1
+	): void
 	{
 		$description = array_merge([$response->getDescription()], $response->getErrors());
 		$this->add(
@@ -105,17 +104,22 @@ class Logger
 
 	/**
 	 * @param string|array $notice
-	 * @return SynchronizationLog
+	 * @return \Sellastica\Connector\Entity\SynchronizationLog
 	 */
-	public function notice($notice): SynchronizationLog
+	public function notice($notice): \Sellastica\Connector\Entity\SynchronizationLog
 	{
 		return $this->add(null, null, null, null, null, $notice);
 	}
 
-	public function clearOldLogEntries(): void
+	/**
+	 * @param string $lookupHistory
+	 * @param string|null $identifier
+	 */
+	public function clearOldLogEntries(string $lookupHistory, string $identifier = null): void
 	{
-		$dateTime = new \DateTime('-1 week');
-		$this->em->getRepository(SynchronizationLog::class)->clearOldLogEntries($dateTime);
+		$dateTime = new \DateTime($lookupHistory);
+		$this->em->getRepository(\Sellastica\Connector\Entity\Synchronization::class)
+			->clearOldLogEntries($dateTime, $identifier);
 	}
 
 	public function save(): void

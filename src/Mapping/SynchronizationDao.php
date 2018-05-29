@@ -74,6 +74,16 @@ class SynchronizationDao extends \Sellastica\Entity\Mapping\Dao
 	}
 
 	/**
+	 * @param \DateTime $dateTime
+	 * @param string|null $identifier
+	 * @return void
+	 */
+	public function clearOldLogEntries(\DateTime $dateTime, string $identifier = null): void
+	{
+		$this->mapper->clearOldLogEntries($dateTime, $identifier);
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	protected function getBuilder(

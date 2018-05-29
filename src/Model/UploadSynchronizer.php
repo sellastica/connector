@@ -38,6 +38,8 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	private $environment;
 	/** @var IIdentifierFactory */
 	private $identifierFactory;
+	/** @var string */
+	private $lookupHistory = '-1 week';
 
 
 	/**
@@ -110,7 +112,11 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		$this->em->persist($synchronization);
 
 		$logger = $this->loggerFactory->create($synchronization->getId());
-		$logger->clearOldLogEntries();
+		//clear records with current identifier older than lookup history
+		$logger->clearOldLogEntries($this->lookupHistory, $this->identifier);
+		//clear all records older than 1 week
+		$logger->clearOldLogEntries('-1 week');
+
 		$this->logDataFetching($logger);
 
 		//counts errors and finishes synchronizing if there is too much errors
@@ -221,7 +227,11 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		$this->em->persist($synchronization);
 
 		$logger = $this->loggerFactory->create($synchronization->getId());
-		$logger->clearOldLogEntries();
+		//clear records with current identifier older than lookup history
+		$logger->clearOldLogEntries($this->lookupHistory, $this->identifier);
+		//clear all records older than 1 week
+		$logger->clearOldLogEntries('-1 week');
+
 		$logger->notice(
 			$this->translator->translate('core.connector.uploading_single_object_to_remote_system'));
 
@@ -278,7 +288,11 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		$this->em->persist($synchronization);
 
 		$logger = $this->loggerFactory->create($synchronization->getId());
-		$logger->clearOldLogEntries();
+		//clear records with current identifier older than lookup history
+		$logger->clearOldLogEntries($this->lookupHistory, $this->identifier);
+		//clear all records older than 1 week
+		$logger->clearOldLogEntries('-1 week');
+
 		$this->logDataFetching($logger);
 
 		do {
@@ -349,6 +363,14 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	public function getDataHandler(): IUploadDataHandler
 	{
 		return $this->dataHandler;
+	}
+
+	/**
+	 * @param string $lookupHistory
+	 */
+	public function setLookupHistory(string $lookupHistory): void
+	{
+		$this->lookupHistory = $lookupHistory;
 	}
 
 	/**

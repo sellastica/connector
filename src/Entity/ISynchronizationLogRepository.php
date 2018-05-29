@@ -25,12 +25,6 @@ interface ISynchronizationLogRepository extends IRepository
 	function getNumberOfRecordsBy(array $filterValues): int;
 
 	/**
-	 * @param \DateTime $dateTime
-	 * @return void
-	 */
-	function clearOldLogEntries(\DateTime $dateTime);
-
-	/**
 	 * @param string $application
 	 * @param string $identifier
 	 * @param int $internalId
