@@ -66,6 +66,14 @@ abstract class AbstractSynchronizer
 		$this->memoryLimit = $limitProvider->getLimitInBytes();
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getProcessId(): int
+	{
+		return $this->processId;
+	}
+
 	public function finishSynchronizing()
 	{
 		$this->finishSynchronizing = true;

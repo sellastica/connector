@@ -199,9 +199,6 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			);
 
 			$synchronization->setStatus(SynchronizationStatus::success());
-			if ($entities->count()) {
-				$this->logFinish($logger);
-			}
 
 		} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
 			$synchronization->setStatus(SynchronizationStatus::fail());
@@ -228,6 +225,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		$synchronization = $this->createSynchronization(
 			SynchronizationType::single(), $this->dataGetter->getSource(), $this->dataHandler->getTarget()
 		);
+		$synchronization->setChangesSince(null);
 		$synchronization->start();
 		$this->em->persist($synchronization);
 
@@ -243,12 +241,11 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		try {
 			$this->onBeforeItemModified($data);
 			$response = $this->dataHandler->modify(
-				$data, $synchronization->getChangesSince(), $this->params
+				$data, null, $this->params
 			);
 			$logger->fromResponse($response);
 			$this->onItemModified($response, $data);
 
-			$this->logFinish($logger);
 			$logger->save();
 
 			$synchronization->end();
@@ -349,10 +346,6 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 
 		$this->onSynchronizationFinished();
 		$this->em->flush(); //flush changes after event
-
-		if ($entities->count()) {
-			$this->logFinish($logger);
-		}
 	}
 
 	/**
@@ -412,13 +405,5 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		}
 
 		$logger->notice($notice);
-	}
-
-	/**
-	 * @param \Sellastica\Connector\Logger\Logger $logger
-	 */
-	private function logFinish(\Sellastica\Connector\Logger\Logger $logger): void
-	{
-		$logger->notice($this->translator->translate('core.connector.uploading_data_to_remote_system_finished'));
 	}
 }
