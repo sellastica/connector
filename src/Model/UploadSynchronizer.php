@@ -16,6 +16,8 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	/** @var array */
 	public $onDataFetched = [];
 	/** @var array */
+	public $onBeforeItemModified = [];
+	/** @var array */
 	public $onItemModified = [];
 	/** @var array */
 	public $onOffsetSynchronized = [];
@@ -141,6 +143,8 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 					$totalItems++;
 					set_time_limit(5);
 					try {
+						$this->onBeforeItemModified($entity);
+
 						//upload remote data to ERP
 						$response = $this->dataHandler->modify(
 							$entity, $synchronization->getChangesSince(), $this->params
