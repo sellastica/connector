@@ -4,6 +4,7 @@ namespace Sellastica\Connector\Model;
 /**
  * @method onDataFetched(\Sellastica\Entity\Entity\EntityCollection $entities)
  * @method onItemModified(ConnectorResponse $response, \Sellastica\Entity\Entity\IEntity $entity)
+ * @method onBeforeItemModified($data)
  * @method onSynchronizationFinished()
  */
 class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronizer
@@ -240,6 +241,7 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			$this->translator->translate('core.connector.uploading_single_object_to_remote_system'));
 
 		try {
+			$this->onBeforeItemModified($data);
 			$response = $this->dataHandler->modify(
 				$data, $synchronization->getChangesSince(), $this->params
 			);
