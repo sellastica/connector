@@ -129,7 +129,6 @@ class Logger
 		}
 
 		$this->em->flush();
-		$this->em->clear();
 		$this->items = [];
 	}
 }
