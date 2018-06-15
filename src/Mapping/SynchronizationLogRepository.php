@@ -2,7 +2,7 @@
 namespace Sellastica\Connector\Mapping;
 
 use Sellastica\Connector\Entity\ISynchronizationLogRepository;
-use Sellastica\DataGrid\Mapping\TFilterRulesRepository;
+use Sellastica\DataGrid\Mapping\Dibi\TFilterRulesRepository;
 
 /**
  * @property \Sellastica\Connector\Mapping\SynchronizationLogDao $dao

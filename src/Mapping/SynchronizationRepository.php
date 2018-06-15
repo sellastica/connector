@@ -3,7 +3,6 @@ namespace Sellastica\Connector\Mapping;
 
 use Sellastica\Connector\Entity\ISynchronizationRepository;
 use Sellastica\Connector\Entity\Synchronization;
-use Sellastica\DataGrid\Mapping\TFilterRulesRepository;
 use Sellastica\Entity\Mapping\Repository;
 
 /**
@@ -12,7 +11,7 @@ use Sellastica\Entity\Mapping\Repository;
  */
 class SynchronizationRepository extends Repository implements ISynchronizationRepository
 {
-	use TFilterRulesRepository;
+	use \Sellastica\DataGrid\Mapping\Dibi\TFilterRulesRepository;
 
 	/**
 	 * @param string $application

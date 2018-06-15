@@ -4,7 +4,6 @@ namespace Sellastica\Connector\Mapping;
 use Sellastica\Connector\Entity\Synchronization;
 use Sellastica\Connector\Entity\SynchronizationBuilder;
 use Sellastica\Connector\Entity\SynchronizationCollection;
-use Sellastica\DataGrid\Mapping\TFilterRulesDao;
 use Sellastica\Entity\Entity\EntityCollection;
 use Sellastica\Entity\Entity\IEntity;
 use Sellastica\Entity\IBuilder;
@@ -15,7 +14,7 @@ use Sellastica\Entity\IBuilder;
  */
 class SynchronizationDao extends \Sellastica\Entity\Mapping\Dao
 {
-	use TFilterRulesDao;
+	use \Sellastica\DataGrid\Mapping\Dibi\TFilterRulesDao;
 	/** @var \Sellastica\Connector\Model\IIdentifierFactory */
 	private $identifierFactory;
 

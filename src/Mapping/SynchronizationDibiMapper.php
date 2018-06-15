@@ -2,7 +2,7 @@
 namespace Sellastica\Connector\Mapping;
 
 use Sellastica\Connector\Entity\Synchronization;
-use Sellastica\DataGrid\Mapping\TFilterRulesDibiMapper;
+use Sellastica\DataGrid\Mapping\Dibi\TFilterRulesDibiMapper;
 use Sellastica\DataGrid\Model\FilterRuleCollection;
 use Sellastica\Entity\Configuration;
 use Sellastica\Entity\Mapping\DibiMapper;

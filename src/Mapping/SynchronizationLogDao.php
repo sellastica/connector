@@ -3,7 +3,7 @@ namespace Sellastica\Connector\Mapping;
 
 use Sellastica\Connector\Entity\SynchronizationLogBuilder;
 use Sellastica\Connector\Entity\SynchronizationLogCollection;
-use Sellastica\DataGrid\Mapping\TFilterRulesDao;
+use Sellastica\DataGrid\Mapping\Dibi\TFilterRulesDao;
 use Sellastica\Entity\Entity\EntityCollection;
 use Sellastica\Entity\IBuilder;
 use Sellastica\Entity\Mapping\Dao;

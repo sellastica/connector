@@ -2,7 +2,7 @@
 namespace Sellastica\Connector\Mapping;
 
 use Sellastica\Connector\Entity\ISynchronizationLogRepository;
-use Sellastica\DataGrid\Mapping\TFilterRulesRepositoryProxy;
+use Sellastica\DataGrid\Mapping\Dibi\TFilterRulesRepositoryProxy;
 use Sellastica\Entity\Mapping\RepositoryProxy;
 
 /**

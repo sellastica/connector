@@ -3,7 +3,6 @@ namespace Sellastica\Connector\Mapping;
 
 use Sellastica\Connector\Entity\ISynchronizationRepository;
 use Sellastica\Connector\Entity\Synchronization;
-use Sellastica\DataGrid\Mapping\TFilterRulesRepositoryProxy;
 
 /**
  * @method \Sellastica\Connector\Mapping\SynchronizationRepository getRepository()
@@ -11,7 +10,7 @@ use Sellastica\DataGrid\Mapping\TFilterRulesRepositoryProxy;
  */
 class SynchronizationRepositoryProxy extends \Sellastica\Entity\Mapping\RepositoryProxy implements ISynchronizationRepository
 {
-	use TFilterRulesRepositoryProxy;
+	use \Sellastica\DataGrid\Mapping\Dibi\TFilterRulesRepositoryProxy;
 
 	public function getLastDownload(
 		string $application,
