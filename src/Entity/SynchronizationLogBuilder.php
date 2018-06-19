@@ -17,7 +17,7 @@ class SynchronizationLogBuilder implements IBuilder
 	private $dateTime;
 	/** @var int|null */
 	private $statusCode;
-	/** @var int|null */
+	/** @var mixed|null */
 	private $internalId;
 	/** @var string|null */
 	private $remoteId;
@@ -80,7 +80,7 @@ class SynchronizationLogBuilder implements IBuilder
 	}
 
 	/**
-	 * @return int|null
+	 * @return mixed|null
 	 */
 	public function getInternalId()
 	{
@@ -88,10 +88,10 @@ class SynchronizationLogBuilder implements IBuilder
 	}
 
 	/**
-	 * @param int|null $internalId
+	 * @param mixed|null $internalId
 	 * @return $this
 	 */
-	public function internalId(int $internalId = null)
+	public function internalId($internalId = null)
 	{
 		$this->internalId = $internalId;
 		return $this;

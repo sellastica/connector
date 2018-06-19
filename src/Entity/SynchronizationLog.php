@@ -22,7 +22,7 @@ class SynchronizationLog extends AbstractEntity
 	private $dateTime;
 	/** @var int|null @optional */
 	private $statusCode;
-	/** @var int|null @optional */
+	/** @var mixed|null @optional */
 	private $internalId;
 	/** @var string|null @optional */
 	private $remoteId;
@@ -145,17 +145,17 @@ class SynchronizationLog extends AbstractEntity
 	}
 
 	/**
-	 * @return int|null
+	 * @return mixed|null
 	 */
-	public function getInternalId(): ?int
+	public function getInternalId()
 	{
 		return $this->internalId;
 	}
 
 	/**
-	 * @param int|null $internalId
+	 * @param $internalId
 	 */
-	public function setInternalId(?int $internalId)
+	public function setInternalId($internalId)
 	{
 		$this->internalId = $internalId;
 	}

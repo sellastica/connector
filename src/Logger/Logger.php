@@ -26,7 +26,7 @@ class Logger
 
 	/**
 	 * @param int $statusCode
-	 * @param int|null $internalId
+	 * @param $internalId
 	 * @param string|null $remoteId
 	 * @param string|null $code
 	 * @param string|null $title
@@ -37,7 +37,7 @@ class Logger
 	 */
 	public function add(
 		int $statusCode = null,
-		int $internalId = null,
+		$internalId = null,
 		string $remoteId = null,
 		string $code = null,
 		string $title = null,

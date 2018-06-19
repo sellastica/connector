@@ -59,18 +59,18 @@ class ConnectorResponse extends Response implements IResponse
 	}
 
 	/**
-	 * @return int|null
+	 * @return mixed
 	 */
-	public function getObjectId(): ?int
+	public function getObjectId()
 	{
 		return $this->objectId;
 	}
 
 	/**
-	 * @param int|null $objectId
+	 * @param $objectId
 	 * @return $this
 	 */
-	public function setObjectId(?int $objectId)
+	public function setObjectId($objectId)
 	{
 		$this->objectId = $objectId;
 		return $this;
