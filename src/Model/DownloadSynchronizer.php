@@ -2,7 +2,9 @@
 namespace Sellastica\Connector\Model;
 
 /**
+ * @method onStart
  * @method onResponseReceived(DownloadResponse $response)
+ * @method onBeforeItemModified($itemData)
  * @method onItemModified(ConnectorResponse $response, $itemData)
  * @method onItemRemoved(ConnectorResponse $response, string $externalId)
  * @method onOffsetSynchronized(DownloadResponse $response)
@@ -13,7 +15,11 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	use \Nette\SmartObject;
 
 	/** @var array */
+	public $onStart = [];
+	/** @var array */
 	public $onResponseReceived = [];
+	/** @var array */
+	public $onBeforeItemModified = [];
 	/** @var array */
 	public $onItemModified = [];
 	/** @var array */
@@ -128,6 +134,9 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		//clear all records older than 1 week
 		$logger->clearOldLogEntries('-1 week');
 
+		//synchronization start
+		$this->onStart();
+
 		try {
 			do {
 				$logger->notice($this->translator->translate(
@@ -159,6 +168,9 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 				$iteration = 0;
 				foreach ($downloadResponse->getData() as $itemData) {
 					set_time_limit(10);
+
+					$this->onBeforeItemModified($itemData);
+
 					//set data to local items
 					$response = $this->dataHandler->modify(
 						$itemData, $synchronization->getChangesSince(), $this->params
@@ -247,14 +259,14 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	 * @param mixed $id
 	 * @param OptionsRequest $params
 	 * @param bool $manual
-	 * @return DownloadResponse
-	 * @throws \Exception
+	 * @return ConnectorResponse
+	 * @throws \Sellastica\Connector\Exception\IErpConnectorException
 	 */
 	public function downloadOne(
 		$id,
 		OptionsRequest $params = null,
 		bool $manual = false
-	): DownloadResponse
+	): ConnectorResponse
 	{
 		//initialization
 		$this->sinceWhen = ISynchronizer::SINCE_EVER;
@@ -313,7 +325,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 			$this->em->persist($synchronization);
 			$this->em->flush();
 
-			return $downloadResponse;
+			return $response;
 
 		} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
 			$logger->notice($this->translator->translate('core.connector.item_not_found'));

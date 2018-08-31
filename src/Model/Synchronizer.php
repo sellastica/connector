@@ -55,10 +55,10 @@ class Synchronizer implements \Sellastica\Connector\Model\ISynchronizer
 	/**
 	 * @param $id
 	 * @param OptionsRequest|null $params
-	 * @return DownloadResponse
+	 * @return ConnectorResponse
 	 * @throws \Exception
 	 */
-	public function downloadOne($id, OptionsRequest $params = null): DownloadResponse
+	public function downloadOne($id, OptionsRequest $params = null): ConnectorResponse
 	{
 		if (!isset($this->downloadSynchronizer)) {
 			throw new \Exception('Cannot download, download synchronizer is not set');

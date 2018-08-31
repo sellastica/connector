@@ -2,6 +2,7 @@
 namespace Sellastica\Connector\Model;
 
 /**
+ * @method onStart
  * @method onDataFetched(\Sellastica\Entity\Entity\EntityCollection $entities)
  * @method onItemModified(ConnectorResponse $response, \Sellastica\Entity\Entity\IEntity $entity)
  * @method onBeforeItemModified($data)
@@ -14,6 +15,8 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	/** maximum number of errors, if only errors occur (no successfull items). If, stop is forced */
 	private const MAX_ERRORS_COUNT = 20;
 
+	/** @var array */
+	public $onStart = [];
 	/** @var array */
 	public $onDataFetched = [];
 	/** @var array */
@@ -125,6 +128,9 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		//counts errors and finishes synchronizing if there is too much errors
 		$totalItems = 0;
 		$errorItems = 0;
+
+		//synchronization start
+		$this->onStart();
 
 		try {
 			do {
