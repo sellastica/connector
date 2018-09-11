@@ -2,21 +2,20 @@
 namespace Sellastica\Connector\Entity;
 
 use Sellastica\Connector\Model\ConnectorResponse;
-use Sellastica\Entity\Entity\AbstractEntity;
-use Sellastica\Entity\Entity\IEntity;
-use Sellastica\Entity\Entity\TAbstractEntity;
 
 /**
  * @generate-builder
- * @see SynchronizationLogBuilder
+ * @see MongoSynchronizationItemBuilder
  *
- * @property SynchronizationLogRelations $relationService
+ * @property MongoSynchronizationItemRelations $relationService
  */
-class SynchronizationLog extends AbstractEntity implements ISynchronizationItem
+class MongoSynchronizationItem extends \Sellastica\Entity\Entity\AbstractEntity
+	implements \Sellastica\MongoDB\Entity\IMongoObject, \Sellastica\Entity\Entity\IEntity, ISynchronizationItem
 {
-	use TAbstractEntity;
+	use \Sellastica\MongoDB\Model\THydrator;
+	use \Sellastica\MongoDB\Entity\TMongoObject;
 
-	/** @var int @required */
+	/** @var \MongoDB\BSON\ObjectId @required */
 	private $synchronizationId;
 	/** @var \DateTime @required */
 	private $dateTime;
@@ -39,43 +38,35 @@ class SynchronizationLog extends AbstractEntity implements ISynchronizationItem
 
 
 	/**
-	 * @param \Sellastica\Connector\Entity\SynchronizationLogBuilder $builder
+	 * @param iterable $data
 	 */
-	public function __construct(\Sellastica\Connector\Entity\SynchronizationLogBuilder $builder)
+	public function __construct(iterable $data)
 	{
-		$this->hydrate($builder);
+		$this->hydrate($data);
 	}
 
 	/**
-	 * @return int
+	 * @return \MongoDB\BSON\ObjectId
 	 */
-	public function getAggregateId(): int
+	public function getSynchronizationId(): \MongoDB\BSON\ObjectId
 	{
 		return $this->synchronizationId;
 	}
 
 	/**
-	 * @return string
+	 * @param \MongoDB\BSON\ObjectId $synchronizationId
 	 */
-	public function getAggregateRootClass(): string
+	public function setSynchronizationId(\MongoDB\BSON\ObjectId $synchronizationId): void
 	{
-		return Synchronization::class;
+		$this->synchronizationId = $synchronizationId;
 	}
 
 	/**
-	 * @return bool
+	 * @return MongoSynchronization
 	 */
-	public static function isIdGeneratedByStorage(): bool
+	public function getSynchronization(): MongoSynchronization
 	{
-		return true;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getSynchronizationId(): int
-	{
-		return $this->synchronizationId;
+		return $this->relationService->getSynchronization();
 	}
 
 	/**
@@ -271,25 +262,9 @@ class SynchronizationLog extends AbstractEntity implements ISynchronizationItem
 	}
 
 	/**
-	 * @return Synchronization
-	 */
-	public function getSynchronization(): Synchronization
-	{
-		return $this->relationService->getSynchronization();
-	}
-
-	/**
-	 * @return \Sellastica\Entity\Entity\IEntity|null
-	 */
-	public function getEntity(): ?IEntity
-	{
-		return $this->relationService->getEntity();
-	}
-
-	/**
 	 * @return bool
 	 */
-	public function isNotice(): bool 
+	public function isNotice(): bool
 	{
 		return !$this->getInternalId()
 			&& !$this->getRemoteId()
@@ -299,21 +274,28 @@ class SynchronizationLog extends AbstractEntity implements ISynchronizationItem
 	}
 
 	/**
+	 * @param bool $filter
 	 * @return array
 	 */
-	public function toArray(): array
+	public function toArray(bool $filter = true): array
 	{
-		return [
-			'synchronizationId' => $this->synchronizationId,
-			'statusCode' => $this->statusCode,
-			'dateTime' => $this->dateTime,
-			'internalId' => $this->internalId,
-			'remoteId' => $this->remoteId,
-			'code' => $this->code,
-			'title' => $this->title,
-			'description' => $this->description,
-			'sourceData' => $this->sourceData,
-			'resultData' => $this->resultData,
-		];
+		$array = array_merge(
+			$this->mongoTraitToArray(),
+			[
+				'synchronizationId' => $this->synchronizationId,
+				'statusCode' => $this->statusCode,
+				'dateTime' => \Sellastica\MongoDB\Utils\DateTime::toUTCDateTime($this->dateTime),
+				'internalId' => $this->internalId,
+				'remoteId' => $this->remoteId,
+				'code' => $this->code,
+				'title' => $this->title,
+				'description' => $this->description,
+				'sourceData' => $this->sourceData,
+				'resultData' => $this->resultData,
+			]
+		);
+		return $filter
+			? \Sellastica\Utils\Arrays::filterNulls($array)
+			: $array;
 	}
 }

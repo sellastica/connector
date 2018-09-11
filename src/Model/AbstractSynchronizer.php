@@ -152,6 +152,31 @@ abstract class AbstractSynchronizer
 	}
 
 	/**
+	 * @param SynchronizationType $type
+	 * @param string $source
+	 * @param string $target
+	 * @return \Sellastica\Connector\Entity\MongoSynchronization
+	 */
+	protected function createMongoSynchronization(
+		SynchronizationType $type,
+		string $source,
+		string $target
+	): \Sellastica\Connector\Entity\MongoSynchronization
+	{
+		$identifier = $this->identifierFactory->create($this->identifier);
+		return \Sellastica\Connector\Entity\MongoSynchronizationBuilder::create(
+			$this->processId,
+			$this->app->getSlug(),
+			$identifier,
+			$source,
+			$target,
+			$type,
+			SynchronizationStatus::running()
+		)->changesSince($this->getSinceWhenDate($source, $target))
+			->build();
+	}
+
+	/**
 	 * @param string $source
 	 * @param string $target
 	 * @return \DateTime|null

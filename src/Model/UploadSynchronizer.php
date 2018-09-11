@@ -46,6 +46,8 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	private $identifierFactory;
 	/** @var string */
 	private $lookupHistory = '-1 week';
+	/** @var bool */
+	private $logNotices = true;
 
 
 	/**
@@ -106,9 +108,17 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		bool $manual = false
 	): void
 	{
-		$synchronization = $this->createSynchronization(
-			SynchronizationType::full(), $this->dataGetter->getSource(), $this->dataHandler->getTarget()
-		);
+		$synchronization = $this->environment->isSellastica()
+			? $this->createSynchronization(
+				SynchronizationType::full(),
+				$this->dataGetter->getSource(),
+				$this->dataHandler->getTarget()
+			)
+			: $this->createMongoSynchronization(
+				SynchronizationType::full(),
+				$this->dataGetter->getSource(),
+				$this->dataHandler->getTarget()
+			);
 		$synchronization->setChangesSince(
 			$this->getSinceWhenDate($this->dataGetter->getSource(), $this->dataHandler->getTarget())
 		);
@@ -117,13 +127,18 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 		$synchronization->start();
 		$this->em->persist($synchronization);
 
-		$logger = $this->loggerFactory->create($synchronization->getId());
+		$logger = $this->environment->isSellastica()
+			? $this->loggerFactory->create($synchronization->getId())
+			: $this->loggerFactory->createMongoLogger($synchronization->getObjectId());
+
 		//clear records with current identifier older than lookup history
 		$logger->clearOldLogEntries($this->lookupHistory, $this->identifier);
 		//clear all records older than 1 week
 		$logger->clearOldLogEntries('-1 week');
 
-		$this->logDataFetching($logger);
+		if ($this->logNotices) {
+			$this->logDataFetching($logger);
+		}
 
 		//counts errors and finishes synchronizing if there is too much errors
 		$totalItems = 0;
@@ -143,7 +158,10 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 				//change offset
 				$this->offset = (int)$this->offset + $this->itemsPerPage;
 				$this->onDataFetched($entities);
-				$this->logDataFetched($logger, $entities->count());
+
+				if ($this->logNotices) {
+					$this->logDataFetched($logger, $entities->count());
+				}
 
 				/** @var \Sellastica\Entity\Entity\IEntity $entity */
 				foreach ($entities as $entity) {
@@ -228,21 +246,36 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	 */
 	public function upload($data): ConnectorResponse
 	{
-		$synchronization = $this->createSynchronization(
-			SynchronizationType::single(), $this->dataGetter->getSource(), $this->dataHandler->getTarget()
-		);
+		set_time_limit(20);
+
+		$synchronization = $this->environment->isSellastica()
+			? $this->createSynchronization(
+				SynchronizationType::full(),
+				$this->dataGetter->getSource(),
+				$this->dataHandler->getTarget()
+			)
+			: $this->createMongoSynchronization(
+				SynchronizationType::full(),
+				$this->dataGetter->getSource(),
+				$this->dataHandler->getTarget()
+			);
 		$synchronization->setChangesSince(null);
 		$synchronization->start();
 		$this->em->persist($synchronization);
 
-		$logger = $this->loggerFactory->create($synchronization->getId());
+		$logger = $this->environment->isSellastica()
+			? $this->loggerFactory->create($synchronization->getId())
+			: $this->loggerFactory->createMongoLogger($synchronization->getObjectId());
+
 		//clear records with current identifier older than lookup history
 		$logger->clearOldLogEntries($this->lookupHistory, $this->identifier);
 		//clear all records older than 1 week
 		$logger->clearOldLogEntries('-1 week');
 
-		$logger->notice(
-			$this->translator->translate('core.connector.uploading_single_object_to_remote_system'));
+		if ($this->logNotices) {
+			$logger->notice(
+				$this->translator->translate('core.connector.uploading_single_object_to_remote_system'));
+		}
 
 		try {
 			$this->onBeforeItemModified($data);
@@ -290,19 +323,32 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 
 	public function batch(): void
 	{
-		$synchronization = $this->createSynchronization(
-			SynchronizationType::batch(), $this->dataGetter->getSource(), $this->dataHandler->getTarget()
-		);
+		$synchronization = $this->environment->isSellastica()
+			? $this->createSynchronization(
+				SynchronizationType::full(),
+				$this->dataGetter->getSource(),
+				$this->dataHandler->getTarget()
+			)
+			: $this->createMongoSynchronization(
+				SynchronizationType::full(),
+				$this->dataGetter->getSource(),
+				$this->dataHandler->getTarget()
+			);
 		$synchronization->start();
 		$this->em->persist($synchronization);
 
-		$logger = $this->loggerFactory->create($synchronization->getId());
+		$logger = $this->environment->isSellastica()
+			? $this->loggerFactory->create($synchronization->getId())
+			: $this->loggerFactory->createMongoLogger($synchronization->getObjectId());
+
 		//clear records with current identifier older than lookup history
 		$logger->clearOldLogEntries($this->lookupHistory, $this->identifier);
 		//clear all records older than 1 week
 		$logger->clearOldLogEntries('-1 week');
 
-		$this->logDataFetching($logger);
+		if ($this->logNotices) {
+			$this->logDataFetching($logger);
+		}
 
 		do {
 			//get local data for upload
@@ -315,7 +361,9 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			$this->onDataFetched($entities);
 
 			if ($entities->count()) {
-				$this->logDataFetched($logger, $entities->count());
+				if ($this->logNotices) {
+					$this->logDataFetched($logger, $entities->count());
+				}
 
 				try {
 					//upload remote data to ERP
@@ -379,6 +427,14 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	}
 
 	/**
+	 * @param bool $logNotices
+	 */
+	public function setLogNotices(bool $logNotices): void
+	{
+		$this->logNotices = $logNotices;
+	}
+
+	/**
 	 * @param int $itemsPerPage
 	 */
 	public function setItemsPerPage(int $itemsPerPage)
@@ -387,9 +443,9 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	}
 
 	/**
-	 * @param \Sellastica\Connector\Logger\Logger $logger
+	 * @param \Sellastica\Connector\Logger\ILogger $logger
 	 */
-	private function logDataFetching(\Sellastica\Connector\Logger\Logger $logger): void
+	private function logDataFetching(\Sellastica\Connector\Logger\ILogger $logger): void
 	{
 		$notice = $this->translator->translate('core.connector.fetching_data_from_local_storage');
 		if ($this->changesOnly()) {
@@ -400,10 +456,10 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 	}
 
 	/**
-	 * @param \Sellastica\Connector\Logger\Logger $logger
+	 * @param \Sellastica\Connector\Logger\ILogger $logger
 	 * @param int $entitiesCount
 	 */
-	private function logDataFetched(\Sellastica\Connector\Logger\Logger $logger, int $entitiesCount): void
+	private function logDataFetched(\Sellastica\Connector\Logger\ILogger $logger, int $entitiesCount): void
 	{
 		$notice = $this->translator->translate('core.connector.count_items_fetched', $entitiesCount);
 		if ($entitiesCount) {

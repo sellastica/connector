@@ -1,0 +1,317 @@
+<?php
+namespace Sellastica\Connector\Entity;
+
+//use Sellastica\Connector\Model\LogSummary;
+use Sellastica\Connector\Model\SynchronizationType;
+
+/**
+ * @generate-builder
+ * @see MongoSynchronizationBuilder
+ */
+class MongoSynchronization extends \Sellastica\Entity\Entity\AbstractEntity
+	implements \Sellastica\MongoDB\Entity\IMongoObject, \Sellastica\Entity\Entity\IEntity
+{
+	use \Sellastica\MongoDB\Model\THydrator;
+	use \Sellastica\MongoDB\Entity\TMongoObject;
+
+	/** @var int @required */
+	private $processId;
+	/** @var string @required */
+	private $application;
+	/** @var \Sellastica\Connector\Model\IIdentifier @required */
+	private $identifier;
+	/** @var string @required */
+	private $source;
+	/** @var string @required */
+	private $target;
+	/** @var \Sellastica\Connector\Model\SynchronizationType @required */
+	private $type;
+	/** @var \Sellastica\Connector\Model\SynchronizationStatus @required */
+	private $status;
+	/** @var \DateTime|null @optional */
+	private $changesSince;
+	/** @var mixed @optional */
+	private $params;
+	/** @var \DateTime|null @optional */
+	private $start;
+	/** @var \DateTime|null @optional */
+	private $end;
+	/** @var bool @optional */
+	private $manual = false;
+	/** @var string|null @optional */
+	private $note;
+
+
+	/**
+	 * @param iterable $data
+	 */
+	public function __construct(iterable $data)
+	{
+		$this->hydrate($data);
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getProcessId(): int
+	{
+		return $this->processId;
+	}
+
+	/**
+	 * @param int $processId
+	 */
+	public function setProcessId(int $processId): void
+	{
+		$this->processId = $processId;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getApplication(): string
+	{
+		return $this->application;
+	}
+
+	/**
+	 * @param string $application
+	 */
+	public function setApplication(string $application)
+	{
+		$this->application = $application;
+	}
+
+	/**
+	 * @return \Sellastica\Connector\Model\IIdentifier
+	 */
+	public function getIdentifier(): \Sellastica\Connector\Model\IIdentifier
+	{
+		return $this->identifier;
+	}
+
+	/**
+	 * @param \Sellastica\Connector\Model\IIdentifier $identifier
+	 */
+	public function setIdentifier(\Sellastica\Connector\Model\IIdentifier $identifier)
+	{
+		$this->identifier = $identifier;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSource(): string
+	{
+		return $this->source;
+	}
+
+	/**
+	 * @param string $source
+	 */
+	public function setSource(string $source)
+	{
+		$this->source = $source;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTarget(): string
+	{
+		return $this->target;
+	}
+
+	/**
+	 * @param string $target
+	 */
+	public function setTarget(string $target)
+	{
+		$this->target = $target;
+	}
+
+	/**
+	 * @return \Sellastica\Connector\Model\SynchronizationType
+	 */
+	public function getType(): SynchronizationType
+	{
+		return $this->type;
+	}
+
+	/**
+	 * @param SynchronizationType $type
+	 */
+	public function setType(SynchronizationType $type)
+	{
+		$this->type = $type;
+	}
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function getChangesSince(): ?\DateTime
+	{
+		return $this->changesSince;
+	}
+
+	/**
+	 * @param \DateTime|null $changesSince
+	 */
+	public function setChangesSince(?\DateTime $changesSince)
+	{
+		$this->changesSince = $changesSince;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getParams()
+	{
+		return $this->params;
+	}
+
+	/**
+	 * @param $params
+	 */
+	public function setParams($params)
+	{
+		$this->params = $params;
+	}
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function getStart(): ?\DateTime
+	{
+		return $this->start;
+	}
+
+	public function start()
+	{
+		$this->start = new \DateTime();
+	}
+
+	/**
+	 * @param \DateTime|null $start
+	 */
+	public function setStart(?\DateTime $start): void
+	{
+		$this->start = $start;
+	}
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function getEnd(): ?\DateTime
+	{
+		return $this->end;
+	}
+
+	public function end()
+	{
+		$this->end = new \DateTime();
+	}
+
+	/**
+	 * @param \DateTime|null $end
+	 */
+	public function setEnd(?\DateTime $end): void
+	{
+		$this->end = $end;
+	}
+
+	/**
+	 * @return \DateInterval|null
+	 */
+	public function getDuration(): ?\DateInterval
+	{
+		if (!$this->start || !$this->end) {
+			return null;
+		}
+
+		return $this->end->diff($this->start);
+	}
+
+	/**
+	 * @return \Sellastica\Connector\Model\SynchronizationStatus
+	 */
+	public function getStatus(): \Sellastica\Connector\Model\SynchronizationStatus
+	{
+		return $this->status;
+	}
+
+	/**
+	 * @param \Sellastica\Connector\Model\SynchronizationStatus $status
+	 */
+	public function setStatus(\Sellastica\Connector\Model\SynchronizationStatus $status): void
+	{
+		$this->status = $status;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getManual(): bool
+	{
+		return $this->manual;
+	}
+
+	/**
+	 * @param bool $manual
+	 */
+	public function setManual(bool $manual)
+	{
+		$this->manual = $manual;
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getNote(): ?string
+	{
+		return $this->note;
+	}
+
+	/**
+	 * @param null|string $note
+	 */
+	public function setNote(?string $note): void
+	{
+		$this->note = $note;
+	}
+
+	/**
+	 * @param bool $filter
+	 * @return array
+	 */
+	public function toArray(bool $filter = true): array
+	{
+		$array = array_merge(
+			$this->mongoTraitToArray(),
+			[
+				'application' => $this->application,
+				'identifier' => $this->identifier->getCode(),
+				'processId' => $this->processId,
+				'source' => $this->source,
+				'target' => $this->target,
+				'type' => $this->type->getType(),
+				'changesSince' => $this->changesSince
+					? \Sellastica\MongoDB\Utils\DateTime::toUTCDateTime($this->changesSince)
+					: null,
+				'params' => isset($this->params) ? serialize($this->params) : null,
+				'start' => $this->start
+					? \Sellastica\MongoDB\Utils\DateTime::toUTCDateTime($this->start)
+					: null,
+				'end' => $this->end
+					? \Sellastica\MongoDB\Utils\DateTime::toUTCDateTime($this->end)
+					: null,
+				'status' => $this->status->getStatus(),
+				'manual' => $this->manual,
+				'note' => $this->note,
+			]
+		);
+		return $filter
+			? \Sellastica\Utils\Arrays::filterNulls($array)
+			: $array;
+	}
+}

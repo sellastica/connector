@@ -1,27 +1,27 @@
 <?php
 namespace Sellastica\Connector\Logger;
 
-class Logger implements ILogger
+class MongoLogger implements ILogger
 {
-	/** @var int */
-	private $synchronizationId;
 	/** @var \Sellastica\Entity\EntityManager */
 	private $em;
-	/** @var \Sellastica\Connector\Entity\ISynchronizationItem[] */
+	/** @var \Sellastica\Connector\Entity\MongoSynchronizationItem[] */
 	private $items = [];
+	/** @var \MongoDB\BSON\ObjectId */
+	private $synchronizationId;
 
 
 	/**
-	 * @param int $synchronizationId
+	 * @param \MongoDB\BSON\ObjectId $synchronizationId
 	 * @param \Sellastica\Entity\EntityManager $em
 	 */
 	public function __construct(
-		int $synchronizationId,
+		\MongoDB\BSON\ObjectId $synchronizationId,
 		\Sellastica\Entity\EntityManager $em
 	)
 	{
-		$this->synchronizationId = $synchronizationId;
 		$this->em = $em;
+		$this->synchronizationId = $synchronizationId;
 	}
 
 	/**
@@ -50,18 +50,18 @@ class Logger implements ILogger
 			$description = implode(PHP_EOL, array_filter($description));
 		}
 
-		$this->items[] = $item = \Sellastica\Connector\Entity\SynchronizationLogBuilder::create(
+		$item = \Sellastica\Connector\Entity\MongoSynchronizationItemBuilder::create(
 			$this->synchronizationId, new \DateTime()
-		)
-			->statusCode($statusCode)
-			->internalId($internalId)
-			->remoteId($remoteId)
-			->code($code)
-			->title($title)
-			->description($description)
-			->sourceData(isset($sourceData) ? serialize($sourceData) : null)
-			->resultData(isset($resultData) ? serialize($resultData) : null)
-			->build();
+		)->build();
+		$item->setStatusCode($statusCode);
+		$item->setInternalId($internalId);
+		$item->setRemoteId($remoteId);
+		$item->setCode($code);
+		$item->setTitle($title);
+		$item->setDescription($description);
+		$item->setSourceData(isset($sourceData) ? serialize($sourceData) : null);
+		$item->setResultData(isset($resultData) ? serialize($resultData) : null);
+		$this->items[] = $item;
 
 		return $item;
 	}
@@ -118,9 +118,6 @@ class Logger implements ILogger
 	 */
 	public function clearOldLogEntries(string $lookupHistory, string $identifier = null): void
 	{
-		$dateTime = new \DateTime($lookupHistory);
-		$this->em->getRepository(\Sellastica\Connector\Entity\Synchronization::class)
-			->clearOldLogEntries($dateTime, $identifier);
 	}
 
 	public function save(): void

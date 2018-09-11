@@ -15,6 +15,7 @@ use Sellastica\Entity\IBuilder;
 class SynchronizationDao extends \Sellastica\Entity\Mapping\Dao
 {
 	use \Sellastica\DataGrid\Mapping\Dibi\TFilterRulesDao;
+
 	/** @var \Sellastica\Connector\Model\IIdentifierFactory */
 	private $identifierFactory;
 

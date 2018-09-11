@@ -12,9 +12,9 @@ interface IDownloadDataHandler
 	function getTarget(): string;
 
 	/**
-	 * @param \Sellastica\Connector\Logger\Logger $logger
+	 * @param \Sellastica\Connector\Logger\ILogger $logger
 	 */
-	function setLogger(\Sellastica\Connector\Logger\Logger $logger);
+	function setLogger(\Sellastica\Connector\Logger\ILogger $logger);
 
 	/**
 	 * @param $data

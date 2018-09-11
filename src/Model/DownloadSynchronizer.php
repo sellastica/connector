@@ -48,6 +48,8 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	private $environment;
 	/** @var string */
 	private $lookupHistory = '-1 week';
+	/** @var bool */
+	private $logNotices = false;
 
 
 	/**
@@ -113,11 +115,18 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		$this->dataHandler->initialize();
 
 		//synchronization entity
-		$synchronization = $this->createSynchronization(
-			SynchronizationType::full(),
-			$this->dataGetter->getSource(),
-			$this->dataHandler->getTarget()
-		);
+		$synchronization = $this->environment->isSellastica()
+			? $this->createSynchronization(
+				SynchronizationType::full(),
+				$this->dataGetter->getSource(),
+				$this->dataHandler->getTarget()
+			)
+			: $this->createMongoSynchronization(
+				SynchronizationType::full(),
+				$this->dataGetter->getSource(),
+				$this->dataHandler->getTarget()
+			);
+
 		$synchronization->setParams($params);
 		$synchronization->setManual($manual);
 		$synchronization->setChangesSince(
@@ -127,7 +136,10 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		$this->em->persist($synchronization);
 		$this->em->flush();
 
-		$logger = $this->loggerFactory->create($synchronization->getId());
+		$logger = $this->environment->isSellastica()
+			? $this->loggerFactory->create($synchronization->getId())
+			: $this->loggerFactory->createMongoLogger($synchronization->getObjectId());
+
 		$this->dataHandler->setLogger($logger);
 		//clear records with current identifier older than lookup history
 		$logger->clearOldLogEntries($this->lookupHistory, $this->identifier);
@@ -139,9 +151,11 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 		try {
 			do {
-				$logger->notice($this->translator->translate(
-					'core.connector.trying_to_download_items', $this->itemsPerPage
-				));
+				if ($this->logNotices) {
+					$logger->notice($this->translator->translate(
+						'core.connector.trying_to_download_items', $this->itemsPerPage
+					));
+				}
 
 				//download remote data
 				//retrive whole response, so we could handle some extra data not present in the data array above
@@ -155,13 +169,15 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 				$this->onResponseReceived($downloadResponse);
 
 				$dataCount = sizeof($downloadResponse->getData());
-				$item = $logger->notice($this->translator->translate(
-					$dataCount ? 'core.connector.number_of_items_fetched' : 'core.connector.no_items_fetched',
-					$dataCount
-				));
-				if ($downloadResponse->getData() !== null
-					&& is_array($downloadResponse->getData())) {
-					$item->setSourceData(serialize($downloadResponse->getData()));
+				if ($this->logNotices) {
+					$item = $logger->notice($this->translator->translate(
+						$dataCount ? 'core.connector.number_of_items_fetched' : 'core.connector.no_items_fetched',
+						$dataCount
+					));
+					if ($downloadResponse->getData() !== null
+						&& is_array($downloadResponse->getData())) {
+						$item->setSourceData(serialize($downloadResponse->getData()));
+					}
 				}
 
 				//items to create or update
@@ -197,15 +213,19 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 				}
 
 				if ((is_array($downloadResponse->getData()) || $downloadResponse->getData() instanceof \Countable)
-					&& sizeof($downloadResponse->getData())) {
+					&& sizeof($downloadResponse->getData())
+					&& $this->logNotices) {
 					$logger->notice($this->translator->translate('core.connector.processing_data_finished'));
 				}
 
 				//items to remove
 				if (sizeof($downloadResponse->getExternalIdsToRemove())) {
-					$logger->notice($this->translator->translate(
-						'removing_number_of_items', sizeof($downloadResponse->getExternalIdsToRemove())
-					));
+					if ($this->logNotices) {
+						$logger->notice($this->translator->translate(
+							'removing_number_of_items', sizeof($downloadResponse->getExternalIdsToRemove())
+						));
+					}
+
 					foreach ($downloadResponse->getExternalIdsToRemove() as $externalId) {
 						//check manual interruption
 						$this->checkManualInterruption($synchronization->getId());
@@ -215,7 +235,10 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 						$logger->fromResponse($response);
 					}
 
-					$logger->notice($this->translator->translate('core.connector.removing_of_items_finished'));
+					if ($this->logNotices) {
+						$logger->notice($this->translator->translate('core.connector.removing_of_items_finished'));
+					}
+
 					$this->em->flush(); //flush removed items
 				}
 
@@ -268,16 +291,24 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		bool $manual = false
 	): ConnectorResponse
 	{
+		set_time_limit(20);
+
 		//initialization
 		$this->sinceWhen = ISynchronizer::SINCE_EVER;
 		$this->dataHandler->initialize();
 
 		//synchronization entity
-		$synchronization = $this->createSynchronization(
-			SynchronizationType::single(),
-			$this->dataGetter->getSource(),
-			$this->dataHandler->getTarget()
-		);
+		$synchronization = $this->environment->isSellastica()
+			? $this->createSynchronization(
+				SynchronizationType::full(),
+				$this->dataGetter->getSource(),
+				$this->dataHandler->getTarget()
+			)
+			: $this->createMongoSynchronization(
+				SynchronizationType::full(),
+				$this->dataGetter->getSource(),
+				$this->dataHandler->getTarget()
+			);
 		$synchronization->setParams($params);
 		$synchronization->setManual($manual);
 		$synchronization->setChangesSince(null);
@@ -286,14 +317,19 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 		$this->em->persist($synchronization);
 		$this->em->flush();
 
-		$logger = $this->loggerFactory->create($synchronization->getId());
+		$logger = $this->environment->isSellastica()
+			? $this->loggerFactory->create($synchronization->getId())
+			: $this->loggerFactory->createMongoLogger($synchronization->getObjectId());
+
 		$this->dataHandler->setLogger($logger);
 		//clear records with current identifier older than lookup history
 		$logger->clearOldLogEntries($this->lookupHistory, $this->identifier);
 		//clear all records older than 1 week
 		$logger->clearOldLogEntries('-1 week');
 
-		$logger->notice($this->translator->translate('core.connector.trying_to_download_sigle_item'));
+		if ($this->logNotices) {
+			$logger->notice($this->translator->translate('core.connector.trying_to_download_sigle_item'));
+		}
 
 		//download remote data
 		//retrive whole response, so we could handle some extra data not present in the data array above
@@ -316,7 +352,10 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 				$logger->fromResponse($response);
 			}
 
-			$logger->notice($this->translator->translate('core.connector.processing_data_finished'));
+			if ($this->logNotices) {
+				$logger->notice($this->translator->translate('core.connector.processing_data_finished'));
+			}
+
 			$logger->save(); //save after each iteration
 			$this->onOffsetSynchronized($downloadResponse);
 
@@ -328,7 +367,9 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 			return $response;
 
 		} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
-			$logger->notice($this->translator->translate('core.connector.item_not_found'));
+			if ($this->logNotices) {
+				$logger->notice($this->translator->translate('core.connector.item_not_found'));
+			}
 
 			//log synchronization fail
 			$synchronization->end();
@@ -348,6 +389,14 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	public function setLookupHistory(string $lookupHistory): void
 	{
 		$this->lookupHistory = $lookupHistory;
+	}
+
+	/**
+	 * @param bool $logNotices
+	 */
+	public function setLogNotices(bool $logNotices): void
+	{
+		$this->logNotices = $logNotices;
 	}
 
 	/**
@@ -400,11 +449,15 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 	}
 
 	/**
-	 * @param int $synchronizationId
+	 * @param int|string $synchronizationId
 	 * @throws \Sellastica\Connector\Exception\AbortException
 	 */
-	private function checkManualInterruption(int $synchronizationId): void
+	private function checkManualInterruption($synchronizationId): void
 	{
+		if (!$this->environment->isSellastica()) {
+			return;
+		}
+
 		$status = $this->em->getRepository(\Sellastica\Connector\Entity\Synchronization::class)
 			->findField($synchronizationId, 'status');
 		if ($status === SynchronizationStatus::INTERRUPTED) {

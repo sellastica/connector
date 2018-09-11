@@ -12,19 +12,26 @@ class LoggerFactory
 	/**
 	 * @param \Sellastica\Entity\EntityManager $em
 	 */
-	public function __construct(
-		EntityManager $em
-	)
+	public function __construct(EntityManager $em)
 	{
 		$this->em = $em;
 	}
 
 	/**
 	 * @param int $synchronizationId
-	 * @return Logger
+	 * @return ILogger
 	 */
-	public function create(int $synchronizationId): Logger
+	public function create(int $synchronizationId): ILogger
 	{
 		return new Logger($synchronizationId, $this->em);
+	}
+
+	/**
+	 * @param \MongoDB\BSON\ObjectId $synchronizationId
+	 * @return ILogger
+	 */
+	public function createMongoLogger(\MongoDB\BSON\ObjectId $synchronizationId): ILogger
+	{
+		return new MongoLogger($synchronizationId, $this->em);
 	}
 }

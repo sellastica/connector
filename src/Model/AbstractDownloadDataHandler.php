@@ -29,9 +29,9 @@ abstract class AbstractDownloadDataHandler implements IDownloadDataHandler
 	}
 
 	/**
-	 * @param \Sellastica\Connector\Logger\Logger $logger
+	 * @param \Sellastica\Connector\Logger\ILogger $logger
 	 */
-	public function setLogger(\Sellastica\Connector\Logger\Logger $logger)
+	public function setLogger(\Sellastica\Connector\Logger\ILogger $logger)
 	{
 		$this->logger = $logger;
 	}
