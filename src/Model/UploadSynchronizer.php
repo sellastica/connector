@@ -6,6 +6,7 @@ namespace Sellastica\Connector\Model;
  * @method onDataFetched(\Sellastica\Entity\Entity\EntityCollection $entities)
  * @method onItemModified(ConnectorResponse $response, \Sellastica\Entity\Entity\IEntity $entity)
  * @method onBeforeItemModified($data)
+ * @method onOffsetSynchronized()
  * @method onSynchronizationFinished()
  */
 class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronizer
@@ -176,7 +177,10 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 						);
 						$this->onItemModified($response, $entity);
 
-						$logger->fromResponse($response);
+						if ($response->getStatusCode() !== ConnectorResponse::IGNORED) {
+							$logger->fromResponse($response);
+						}
+
 						$this->em->flush();
 
 						//force finish if there is too much errors
@@ -282,7 +286,10 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			$response = $this->dataHandler->modify(
 				$data, null, $this->params
 			);
-			$logger->fromResponse($response);
+			if ($response->getStatusCode() !== ConnectorResponse::IGNORED) {
+				$logger->fromResponse($response);
+			}
+
 			$this->onItemModified($response, $data);
 
 			$logger->save();
@@ -291,6 +298,10 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 			$synchronization->setStatus(SynchronizationStatus::success());
 			$this->em->persist($synchronization);
 			$this->em->flush(); //perform external ID save in CLI run
+
+			$this->onOffsetSynchronized();
+			$this->onSynchronizationFinished();
+			$this->em->flush(); //flush changes after event
 
 			return $response;
 
@@ -368,7 +379,10 @@ class UploadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchronize
 				try {
 					//upload remote data to ERP
 					$response = $this->dataHandler->batch($entities);
-					$logger->fromResponse($response, $entities->count());
+					if ($response->getStatusCode() !== ConnectorResponse::IGNORED) {
+						$logger->fromResponse($response, $entities->count());
+					}
+
 					$this->em->flush();
 				} catch (\Sellastica\Connector\Exception\IErpConnectorException $e) {
 					//all responses with status code >= 400 must throw IErpConnectorException!
