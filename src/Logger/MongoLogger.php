@@ -59,8 +59,13 @@ class MongoLogger implements ILogger
 		$item->setCode($code);
 		$item->setTitle($title);
 		$item->setDescription($description);
-		$item->setSourceData(isset($sourceData) ? serialize($sourceData) : null);
-		$item->setResultData(isset($resultData) ? serialize($resultData) : null);
+
+		try {
+			$item->setSourceData(isset($sourceData) ? serialize($sourceData) : null);
+			$item->setResultData(isset($resultData) ? serialize($resultData) : null);
+		} catch (\Exception $e) {
+		}
+
 		$this->items[] = $item;
 
 		return $item;
