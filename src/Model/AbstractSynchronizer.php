@@ -74,9 +74,14 @@ abstract class AbstractSynchronizer
 		return $this->processId;
 	}
 
-	public function finishSynchronizing()
+	public function finishSynchronizing(): void
 	{
 		$this->finishSynchronizing = true;
+	}
+
+	public function continueSynchronizing(): void
+	{
+		$this->finishSynchronizing = false;
 	}
 
 	/**
