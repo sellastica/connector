@@ -17,6 +17,8 @@ abstract class AbstractSynchronizer
 	protected $sinceWhen = ISynchronizer::SINCE_LAST_SYNC;
 	/** @var bool */
 	protected $finishSynchronizing = false;
+	/** @var bool */
+	protected $forceContinueSynchronizing = false;
 	/** @var string */
 	protected $identifier;
 	/** @var int */
@@ -82,6 +84,22 @@ abstract class AbstractSynchronizer
 	public function continueSynchronizing(): void
 	{
 		$this->finishSynchronizing = false;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isSynchronizingForced(): bool
+	{
+		return $this->forceContinueSynchronizing;
+	}
+
+	/**
+	 * @param bool $force
+	 */
+	public function forceContinueSynchronizing(bool $force = true): void
+	{
+		$this->forceContinueSynchronizing = $force;
 	}
 
 	/**

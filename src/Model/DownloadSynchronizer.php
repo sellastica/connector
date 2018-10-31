@@ -151,6 +151,8 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 		try {
 			do {
+				$this->forceContinueSynchronizing = false;
+
 				if ($this->logNotices) {
 					$logger->notice($this->translator->translate(
 						'core.connector.trying_to_download_items', $this->itemsPerPage
@@ -245,7 +247,7 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 				$logger->save(); //save after each iteration
 				$this->onOffsetSynchronized($downloadResponse);
 			} while (
-				$downloadResponse->getData()
+				($downloadResponse->getData() || $this->isSynchronizingForced())
 				&& $this->finishSynchronizing !== true
 			);
 

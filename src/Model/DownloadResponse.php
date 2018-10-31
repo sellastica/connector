@@ -9,6 +9,8 @@ class DownloadResponse
 	private $data;
 	/** @var array */
 	private $externalIdsToRemove = [];
+	/** @var bool */
+	private $forceContinueSynchronizing = false;
 
 
 	/**
@@ -51,5 +53,21 @@ class DownloadResponse
 	public function setExternalIdsToRemove(array $externalIdsToRemove)
 	{
 		$this->externalIdsToRemove = $externalIdsToRemove;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isSynchronizingForced(): bool
+	{
+		return $this->forceContinueSynchronizing;
+	}
+
+	/**
+	 * @param bool $force
+	 */
+	public function forceContinueSynchronizing(bool $force = true): void
+	{
+		$this->forceContinueSynchronizing = $force;
 	}
 }
