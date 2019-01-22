@@ -184,34 +184,36 @@ class DownloadSynchronizer extends \Sellastica\Connector\Model\AbstractSynchroni
 
 				//items to create or update
 				$iteration = 0;
-				foreach ($downloadResponse->getData() as $itemData) {
-					set_time_limit(10);
+				if (is_iterable($downloadResponse->getData())) {
+					foreach ($downloadResponse->getData() as $itemData) {
+						set_time_limit(10);
 
-					$this->onBeforeItemModified($itemData);
+						$this->onBeforeItemModified($itemData);
 
-					//set data to local items
-					$response = $this->dataHandler->modify(
-						$itemData, $synchronization->getChangesSince(), $this->params
-					);
+						//set data to local items
+						$response = $this->dataHandler->modify(
+							$itemData, $synchronization->getChangesSince(), $this->params
+						);
 
-					$this->onItemModified($response, $itemData);
-					if ($response->getStatusCode() !== ConnectorResponse::IGNORED) {
-						if (!$response->getSourceData()) {
-							$response->setSourceData($itemData);
+						$this->onItemModified($response, $itemData);
+						if ($response->getStatusCode() !== ConnectorResponse::IGNORED) {
+							if (!$response->getSourceData()) {
+								$response->setSourceData($itemData);
+							}
+
+							$logger->fromResponse($response);
 						}
 
-						$logger->fromResponse($response);
-					}
+						if ($iteration % 100 === 0) {
+							$logger->save();
+							//check manual interruption
+							$this->checkManualInterruption($synchronization->getId());
+						}
 
-					if ($iteration % 100 === 0) {
-						$logger->save();
-						//check manual interruption
-						$this->checkManualInterruption($synchronization->getId());
+						//memory limit check
+						$this->checkMemoryLimit();
+						$iteration++;
 					}
-
-					//memory limit check
-					$this->checkMemoryLimit();
-					$iteration++;
 				}
 
 				if ((is_array($downloadResponse->getData()) || $downloadResponse->getData() instanceof \Countable)
